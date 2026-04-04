@@ -41,7 +41,8 @@ databricks.cfg
 # Claude Code MCP discovery file at repo root
 mcp.json
 
-# Claude Code local settings (machine-specific, may contain personal config)
+# Claude Code settings (may contain machine-specific paths and hooks)
+.claude/settings.json
 .claude/settings.local.json
 
 # ==============================================================================
