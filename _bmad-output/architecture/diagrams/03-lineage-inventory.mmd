@@ -1,0 +1,39 @@
+flowchart LR
+    subgraph SOURCES_I["Source Systems"]
+        ERP_INV["ERP Inventory Snapshots\nCSV / Daily\n/mnt/landing/erp/inventory/"]
+    end
+
+    subgraph BRONZE_I["Bronze — brz_freshsip"]
+        B_INV["erp_inventory_raw\n- All columns as STRING\n- Append-only\n- Partition: ingestion_date"]
+    end
+
+    subgraph SILVER_I["Silver — slv_freshsip"]
+        SV_STOCK["inventory_stock\n- Typed columns\n- Unique on sku+wh+date\n- MERGE upsert\n- Partition: snapshot_date"]
+        SV_ROP["ref_reorder_points\n- reorder thresholds per sku+wh\n- SCD Type 1 overwrite"]
+        SV_REF_P2["ref_products\n- standard_cost_per_unit\n- product_category"]
+    end
+
+    subgraph GOLD_I["Gold — gld_freshsip"]
+        G_SL["inventory_stock_levels\nKPI-I01 and KPI-I04\nCurrent stock + reorder_alert_flag\nHourly refresh"]
+        G_IT["inventory_turnover\nKPI-I02\nSUM(COGS_30d) / AVG(inventory_value_30d)\nWeekly by warehouse"]
+        G_DSI["inventory_dsi\nKPI-I03\nunits_on_hand / avg_daily_sales\nDaily by sku+warehouse"]
+    end
+
+    subgraph SALES_REF["Sales Silver - cross-domain join"]
+        SV_SALES["sales_transactions\n- quantity_sold\n- transaction_date\n- sku_id"]
+    end
+
+    ERP_INV --> B_INV
+    B_INV --> SV_STOCK
+    B_INV --> SV_ROP
+
+    SV_STOCK --> G_SL
+    SV_ROP --> G_SL
+    SV_REF_P2 --> G_SL
+
+    SV_STOCK --> G_IT
+    SV_SALES --> G_IT
+    SV_REF_P2 --> G_IT
+
+    SV_STOCK --> G_DSI
+    SV_SALES --> G_DSI

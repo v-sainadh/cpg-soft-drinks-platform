@@ -1,0 +1,47 @@
+flowchart LR
+    subgraph SOURCES_S["Source Systems"]
+        POS["POS Transactions\nJSON / Hourly\n/mnt/landing/pos/"]
+        ERP_S["ERP Sales Orders\nCSV / Daily\n/mnt/landing/erp/sales/"]
+        ERP_R["ERP Returns\nCSV / Daily\n/mnt/landing/erp/returns/"]
+    end
+
+    subgraph BRONZE_S["Bronze — brz_freshsip"]
+        B_POS["pos_transactions_raw\n- All columns as STRING\n- Append-only\n- Partition: ingestion_date"]
+        B_ERP_S["erp_sales_raw\n- All columns as STRING\n- Append-only\n- Partition: ingestion_date"]
+        B_ERP_R["erp_returns_raw\n- All columns as STRING\n- Append-only\n- Partition: ingestion_date"]
+    end
+
+    subgraph SILVER_S["Silver — slv_freshsip"]
+        SV_TXN["sales_transactions\n- Typed columns\n- Dedup on transaction_id\n- MERGE upsert\n- Partition: transaction_date"]
+        SV_RET["sales_returns\n- Typed columns\n- Dedup on return_id\n- Partition: return_date"]
+        SV_SPEND["sales_spend\n- Spend per retailer/period\n- For CAC calculation"]
+        SV_REF_P["ref_products\n- Current product attributes\n- standard_cost_per_unit\n- SCD Type 1 overwrite"]
+    end
+
+    subgraph GOLD_S["Gold — gld_freshsip"]
+        G_DR["sales_daily_revenue\nKPI-S01\nSUM(unit_price x qty) - SUM(return_amount)\nGroup by date, category, region, channel"]
+        G_PC["sales_period_comparison\nKPI-S02 (MoM%) + KPI-S03 (YoY%)\nRolls up sales_daily_revenue"]
+        G_GM["sales_gross_margin_sku\nKPI-S04\n(net_revenue - cogs) / net_revenue * 100\nGroup by week, sku_id"]
+        G_TR["customers_top_retailers\nKPI-C01\nRanked SUM(net_revenue) per retailer"]
+    end
+
+    POS --> B_POS
+    ERP_S --> B_ERP_S
+    ERP_R --> B_ERP_R
+
+    B_POS --> SV_TXN
+    B_ERP_S --> SV_TXN
+    B_ERP_R --> SV_RET
+    B_ERP_R --> SV_SPEND
+
+    SV_TXN --> G_DR
+    SV_RET --> G_DR
+    SV_REF_P --> G_DR
+
+    G_DR --> G_PC
+    SV_TXN --> G_GM
+    SV_RET --> G_GM
+    SV_REF_P --> G_GM
+
+    SV_TXN --> G_TR
+    SV_RET --> G_TR

@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://freshsip.internal/schemas/bronze/logistics_shipments",
+  "title": "Logistics Shipment — Bronze Source Schema",
+  "description": "JSON Schema for validating raw logistics shipment records from daily CSV files provided by the logistics partner, before ingestion into brz_freshsip.logistics_shipments_raw.",
+  "type": "object",
+  "required": [
+    "shipment_id",
+    "order_id",
+    "retailer_id",
+    "warehouse_id",
+    "route_id",
+    "ship_date",
+    "promised_delivery_date",
+    "channel"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "shipment_id": {
+      "type": "string",
+      "description": "Unique shipment identifier assigned by the logistics partner; used for deduplication in Silver",
+      "minLength": 1,
+      "examples": ["SHIP-2026-00001", "SHP-NE-20260405-001"]
+    },
+    "order_id": {
+      "type": "string",
+      "description": "FreshSip ERP order identifier that this shipment fulfills; cross-references erp_sales_raw",
+      "minLength": 1,
+      "examples": ["ORD-2026-00001"]
+    },
+    "batch_id": {
+      "type": "string",
+      "description": "Production batch identifier for the goods in this shipment; optional field required for KPI-P04 batch traceability. If present, must match a batch_id in the production IoT data. If absent, batch traceability for this shipment will be null.",
+      "examples": ["BATCH-2026-0042", "BATCH-2026-0099"]
+    },
+    "retailer_id": {
+      "type": "string",
+      "description": "Destination retailer account identifier",
+      "minLength": 1,
+      "examples": ["RTL-001", "RTL-WALMART-NE"]
+    },
+    "warehouse_id": {
+      "type": "string",
+      "description": "Origin warehouse from which the shipment departed",
+      "minLength": 1,
+      "examples": ["WH-NE-001", "WH-SE-003"]
+    },
+    "route_id": {
+      "type": "string",
+      "description": "Logistics route identifier; used for route performance KPI (KPI-D04)",
+      "minLength": 1,
+      "examples": ["ROUTE-NE-001", "ROUTE-SE-A1"]
+    },
+    "carrier_id": {
+      "type": "string",
+      "description": "Carrier or logistics company identifier; informational only",
+      "examples": ["CARRIER-FEDEX", "CARRIER-UPS", "CARRIER-OWN"]
+    },
+    "ship_date": {
+      "type": "string",
+      "description": "Date the shipment departed the warehouse; cast to DATE in Silver",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "examples": ["2026-04-05"]
+    },
+    "promised_delivery_date": {
+      "type": "string",
+      "description": "Committed delivery date from ERP order; used as the benchmark for OTD calculation; cast to DATE in Silver",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "examples": ["2026-04-07"]
+    },
+    "actual_delivery_date": {
+      "type": "string",
+      "description": "Actual date the shipment was received at the destination; may be null until delivery is confirmed; cast to DATE in Silver",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "examples": ["2026-04-07", "2026-04-09"]
+    },
+    "cases_delivered": {
+      "type": "string",
+      "description": "Number of cases confirmed delivered; cast to INTEGER in Silver",
+      "pattern": "^[0-9]+$",
+      "examples": ["24", "144", "288"]
+    },
+    "logistics_cost_usd": {
+      "type": "string",
+      "description": "Total logistics cost for this shipment in USD; cast to DECIMAL in Silver; used for cost-per-case KPI",
+      "pattern": "^[0-9]+(\\.[0-9]{1,4})?$",
+      "examples": ["125.50", "450.00", "89.75"]
+    },
+    "channel": {
+      "type": "string",
+      "description": "Distribution channel for this shipment",
+      "enum": ["Retail", "Wholesale", "DTC"],
+      "examples": ["Retail", "Wholesale"]
+    },
+    "region": {
+      "type": "string",
+      "description": "US geographic region of the destination",
+      "enum": ["Northeast", "Southeast", "Midwest", "Southwest", "West"],
+      "examples": ["Northeast", "Southeast"]
+    },
+    "state": {
+      "type": "string",
+      "description": "US state code of the destination",
+      "pattern": "^[A-Z]{2}$",
+      "minLength": 2,
+      "maxLength": 2,
+      "examples": ["NY", "CA", "TX"]
+    },
+    "is_fully_shipped": {
+      "type": "string",
+      "description": "Whether all ordered items were shipped; cast to BOOLEAN in Silver; used for fulfillment rate KPI",
+      "enum": ["true", "false", "TRUE", "FALSE", "1", "0"],
+      "examples": ["true", "false"]
+    },
+    "quantity_ordered": {
+      "type": "string",
+      "description": "Original quantity ordered by the retailer; cast to INTEGER in Silver",
+      "pattern": "^[1-9][0-9]*$",
+      "examples": ["24", "144"]
+    },
+    "quantity_shipped": {
+      "type": "string",
+      "description": "Quantity actually included in this shipment; may be less than quantity_ordered for partial shipments; cast to INTEGER in Silver",
+      "pattern": "^[0-9]+$",
+      "examples": ["24", "120", "0"]
+    }
+  }
+}

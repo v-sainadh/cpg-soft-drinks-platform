@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://freshsip.internal/schemas/bronze/erp_customers",
+  "title": "ERP Customer / Retailer Master — Bronze Source Schema",
+  "description": "JSON Schema for validating raw ERP customer and retailer master data from daily CSV files before ingestion into brz_freshsip.erp_customers_raw. SCD Type 2 history is applied in the Silver layer.",
+  "type": "object",
+  "required": [
+    "retailer_id",
+    "retailer_name",
+    "retail_segment",
+    "channel",
+    "region",
+    "state",
+    "account_status",
+    "record_effective_date"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "retailer_id": {
+      "type": "string",
+      "description": "Unique FreshSip retailer account identifier; business key for SCD Type 2 in Silver",
+      "minLength": 1,
+      "examples": ["RTL-001", "RTL-WALMART-NE", "RTL-TARGET-MW"]
+    },
+    "retailer_name": {
+      "type": "string",
+      "description": "Legal business name of the retailer",
+      "minLength": 1,
+      "examples": ["Walmart Stores Northeast", "Target Corporation Midwest"]
+    },
+    "retail_segment": {
+      "type": "string",
+      "description": "Segment classification for the retailer account",
+      "enum": ["Grocery", "Convenience", "Club", "Foodservice", "Drug", "Mass"],
+      "examples": ["Grocery", "Convenience", "Club"]
+    },
+    "channel": {
+      "type": "string",
+      "description": "Distribution channel through which this retailer is served",
+      "enum": ["Retail", "Wholesale", "DTC"],
+      "examples": ["Retail", "Wholesale"]
+    },
+    "region": {
+      "type": "string",
+      "description": "US geographic region of the retailer's primary operations",
+      "enum": ["Northeast", "Southeast", "Midwest", "Southwest", "West"],
+      "examples": ["Northeast"]
+    },
+    "state": {
+      "type": "string",
+      "description": "US state code of the retailer's primary location",
+      "pattern": "^[A-Z]{2}$",
+      "minLength": 2,
+      "maxLength": 2,
+      "examples": ["NY", "CA", "TX"]
+    },
+    "city": {
+      "type": "string",
+      "description": "City of the retailer's primary location; informational",
+      "examples": ["New York", "Los Angeles", "Chicago"]
+    },
+    "credit_terms_days": {
+      "type": "string",
+      "description": "Net payment terms in days; cast to INTEGER in Silver; standard values are 15, 30, 45, 60, 90",
+      "pattern": "^[0-9]+$",
+      "examples": ["30", "45", "60"]
+    },
+    "account_activation_date": {
+      "type": "string",
+      "description": "Date the retailer account was first activated in ERP; used for CAC calculation window; cast to DATE in Silver",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "examples": ["2023-01-15", "2024-06-01"]
+    },
+    "account_status": {
+      "type": "string",
+      "description": "Current status of the retailer account",
+      "enum": ["ACTIVE", "INACTIVE", "SUSPENDED"],
+      "examples": ["ACTIVE", "INACTIVE"]
+    },
+    "trade_spend_usd": {
+      "type": "string",
+      "description": "Trade spend allocated to this account for the current ERP period in USD; used for CAC calculation; cast to DECIMAL in Silver",
+      "pattern": "^[0-9]+(\\.[0-9]{1,4})?$",
+      "examples": ["5000.00", "12500.50", "0.00"]
+    },
+    "broker_commission_usd": {
+      "type": "string",
+      "description": "Broker commission paid for this account in the current period in USD; cast to DECIMAL in Silver",
+      "pattern": "^[0-9]+(\\.[0-9]{1,4})?$",
+      "examples": ["1500.00", "0.00"]
+    },
+    "field_sales_cost_usd": {
+      "type": "string",
+      "description": "Field sales cost allocated to this account in the current period in USD; cast to DECIMAL in Silver",
+      "pattern": "^[0-9]+(\\.[0-9]{1,4})?$",
+      "examples": ["2000.00", "500.00", "0.00"]
+    },
+    "record_effective_date": {
+      "type": "string",
+      "description": "Date from which this version of the customer record is effective; required for SCD Type 2 processing in Silver",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "examples": ["2026-04-05", "2026-01-01"]
+    }
+  }
+}

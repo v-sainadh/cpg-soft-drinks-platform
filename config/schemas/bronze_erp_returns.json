@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://freshsip.internal/schemas/bronze/erp_returns",
+  "title": "ERP Returns — Bronze Source Schema",
+  "description": "JSON Schema for validating raw ERP return records from daily CSV files before ingestion into brz_freshsip.erp_returns_raw.",
+  "type": "object",
+  "required": [
+    "return_id",
+    "retailer_id",
+    "sku_id",
+    "quantity_returned",
+    "return_amount",
+    "return_date",
+    "return_reason_code"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "return_id": {
+      "type": "string",
+      "description": "Unique return transaction identifier; used for deduplication in Silver",
+      "minLength": 1,
+      "examples": ["RET-2026-00001"]
+    },
+    "transaction_id": {
+      "type": "string",
+      "description": "Originating POS transaction identifier; may be null for ERP-only return adjustments",
+      "examples": ["TXN-20260405-001234"]
+    },
+    "order_id": {
+      "type": "string",
+      "description": "Originating ERP order identifier; used for cross-reference with erp_sales_raw",
+      "examples": ["ORD-2026-00001"]
+    },
+    "retailer_id": {
+      "type": "string",
+      "description": "Retailer account that initiated the return",
+      "minLength": 1,
+      "examples": ["RTL-001"]
+    },
+    "sku_id": {
+      "type": "string",
+      "description": "SKU being returned",
+      "minLength": 1,
+      "examples": ["SKU-CSD-001"]
+    },
+    "quantity_returned": {
+      "type": "string",
+      "description": "Units returned; cast to INTEGER in Silver; must be positive",
+      "pattern": "^[1-9][0-9]*$",
+      "examples": ["12", "24"]
+    },
+    "return_amount": {
+      "type": "string",
+      "description": "Credit amount issued in USD; cast to DECIMAL in Silver; must be positive",
+      "pattern": "^[0-9]+(\\.[0-9]{1,4})?$",
+      "examples": ["35.88", "108.00"]
+    },
+    "return_date": {
+      "type": "string",
+      "description": "Date the return was processed in ERP; cast to DATE in Silver",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "examples": ["2026-04-10", "2026-01-20"]
+    },
+    "return_reason_code": {
+      "type": "string",
+      "description": "Standardized reason code for the return; validated against reference list in Silver",
+      "enum": ["DAMAGED", "EXPIRED", "WRONG_ITEM", "QUALITY", "OTHER"],
+      "examples": ["DAMAGED", "EXPIRED", "QUALITY"]
+    }
+  }
+}

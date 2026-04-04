@@ -1,0 +1,51 @@
+flowchart LR
+    subgraph SOURCES_C["Source Systems"]
+        ERP_C["ERP Customer / Retailer Master\nCSV / Daily\n/mnt/landing/erp/customers/"]
+        ERP_P_C["ERP Product Master\nCSV / Daily\n/mnt/landing/erp/products/"]
+    end
+
+    subgraph BRONZE_C["Bronze — brz_freshsip"]
+        B_CUST["erp_customers_raw\n- All columns as STRING\n- Append-only\n- Partition: ingestion_date"]
+        B_PROD["erp_products_raw\n- All columns as STRING\n- Append-only\n- Partition: ingestion_date"]
+    end
+
+    subgraph SILVER_C["Silver — slv_freshsip"]
+        SV_CUST["customers\nSCD Type 2\n- surrogate_key, valid_from/to, is_current\n- MERGE on retailer_id"]
+        SV_PROD["products\nSCD Type 2\n- surrogate_key, valid_from/to, is_current\n- MERGE on sku_id"]
+        SV_REF_P3["ref_products\n- SCD Type 1 overwrite\n- Current product attrs\n- standard_cost_per_unit"]
+        SV_SPEND2["sales_spend\n- trade_spend / broker_commission\n- field_sales_cost per retailer"]
+    end
+
+    subgraph GOLD_C["Gold — gld_freshsip"]
+        G_TOP["customers_top_retailers\nKPI-C01\nRanked SUM(net_revenue) per retailer\nWeekly + MTD"]
+        G_CAC["customers_cac\nKPI-C02\nSUM(acquisition_spend) / COUNT(new_accounts)\nMonthly by segment"]
+        G_RET["customers_retention\nKPI-C03\nRETAINED / PRIOR_ACTIVE * 100\nMonthly by region"]
+        G_CONC["customers_concentration_risk\nKPI-C04\nTop5_revenue / total_revenue * 100\nMonthly"]
+    end
+
+    subgraph SALES_REF2["Sales Silver - cross-domain"]
+        SV_SALES2["sales_transactions\n- retailer_id\n- unit_price, quantity_sold\n- transaction_date"]
+        SV_RET2["sales_returns\n- return_amount\n- transaction_id"]
+    end
+
+    ERP_C --> B_CUST
+    ERP_P_C --> B_PROD
+
+    B_CUST --> SV_CUST
+    B_CUST --> SV_SPEND2
+    B_PROD --> SV_PROD
+    B_PROD --> SV_REF_P3
+
+    SV_SALES2 --> G_TOP
+    SV_RET2 --> G_TOP
+    SV_CUST --> G_TOP
+
+    SV_CUST --> G_CAC
+    SV_SPEND2 --> G_CAC
+
+    SV_CUST --> G_RET
+    SV_SALES2 --> G_RET
+
+    G_TOP --> G_CONC
+    SV_SALES2 --> G_CONC
+    SV_CUST --> G_CONC

@@ -1,0 +1,27 @@
+flowchart LR
+    subgraph SOURCES_D["Source Systems"]
+        LOG["Logistics Partner Shipment Data\nCSV / Daily\n/mnt/landing/logistics/"]
+    end
+
+    subgraph BRONZE_D["Bronze — brz_freshsip"]
+        B_LOG["logistics_shipments_raw\n- All columns as STRING\n- Append-only\n- Partition: ingestion_date"]
+    end
+
+    subgraph SILVER_D["Silver — slv_freshsip"]
+        SV_SHIP["shipments\n- Typed columns\n- on_time_flag computed\n- is_fully_shipped computed\n- MERGE upsert on shipment_id\n- Partition: ship_date"]
+    end
+
+    subgraph GOLD_D["Gold — gld_freshsip"]
+        G_OTD["distribution_otd\nKPI-D01\nSUM(on_time) / COUNT(*) * 100\nDaily by channel + region"]
+        G_FULL["distribution_fulfillment\nKPI-D02\nSUM(is_fully_shipped) / COUNT(order_id) * 100\nDaily by channel"]
+        G_COST["distribution_cost\nKPI-D03\nSUM(logistics_cost) / SUM(cases_delivered)\nWeekly by region + route"]
+        G_ROUTE["distribution_route_performance\nKPI-D04\nRANK routes by OTD ascending\nWeekly top 10 worst routes"]
+    end
+
+    LOG --> B_LOG
+    B_LOG --> SV_SHIP
+
+    SV_SHIP --> G_OTD
+    SV_SHIP --> G_FULL
+    SV_SHIP --> G_COST
+    SV_SHIP --> G_ROUTE

@@ -1,8 +1,54 @@
 # Jira Project Plan — FreshSip Beverages CPG Data Platform
 
 **Generated:** 2026-04-05
+**Last Updated:** 2026-04-05 (Phase 3 Solutioning complete)
 **Project Key:** CPG
 **Platform:** Jira Software (Scrum)
+
+---
+
+## Phase 3 Solutioning Update — 2026-04-05
+
+**Status:** Architecture complete. Gate check: CONDITIONAL PASS. Sprint 1 cleared to start.
+
+### Architecture Artifacts Produced
+- `_bmad-output/architecture/architecture-overview.md` — High-level Mermaid architecture diagram
+- `_bmad-output/architecture/schema-bronze.md` — 8 Bronze table DDLs
+- `_bmad-output/architecture/schema-silver.md` — 11 Silver + 2 reference table DDLs with SCD Type 2
+- `_bmad-output/architecture/schema-gold.md` — Star schema: 6 dims + 4 facts + 18 KPI tables with SQL
+- `_bmad-output/architecture/data-quality-rules.md` — DQ rules by layer and table
+- `_bmad-output/architecture/data-lineage.md` — Column-level lineage per domain
+- `_bmad-output/architecture/diagrams/*.mmd` — 6 standalone Mermaid diagram files
+- `_bmad-output/architecture/traceability-matrix.md` — KPI→story→table traceability
+- `config/schemas/*.json` — 8 JSON Schema files for Bronze validation
+- `_bmad-output/architecture/phase3-solutioning-gate-check.md` — Gate check report
+
+### KPI Coverage: 14/20 Fully Covered
+- Sales: 4/4 ✅ | Inventory: 3/4 ⚠️ | Production: 3/4 ⚠️ | Distribution: 3/4 ⚠️ | Customers: 3/4 ⚠️
+
+### Tickets Requiring Updates (from architecture validation)
+
+| Ticket | Update Required | Severity |
+|---|---|---|
+| CPG-012 | AC-1: Table name should be `brz_freshsip.iot_sensor_events_raw` (not `iot_production_raw`) | LOW |
+| CPG-014 | AC-1: Column `yield_rate_pct` (not `batch_yield_rate_pct`); AC-3: `qc_pass_rate_pct` and `qc_warn_flag` | LOW |
+| CPG-018 | AC-3: Column `fulfillment_warn_flag` (not `fulfillment_alert_flag`) | LOW |
+| CPG-019 | AC-1: Column `cost_per_case` (not `cost_per_case_usd`) | LOW |
+| CPG-021 | AC-1/4: SCD columns are `valid_from`/`valid_to` (not `effective_start_date`/`effective_end_date`) | LOW |
+| CPG-010 | AC-3: Column `turnover_warn_flag` — to be renamed `turnover_alert_flag` per A4 action | LOW |
+| CPG-029 | AC-1: `pipeline_dq_log` schema not yet defined — blocked pending GAP-14 resolution | MEDIUM |
+
+### New Architecture Tickets (Recommended — Add to Backlog)
+
+| Proposed ID | Title | Epic | Sprint | Points | Priority |
+|---|---|---|---|---|---|
+| CPG-031 | Fix: Add `batch_id` FK to `slv_freshsip.shipments` DDL and Bronze logistics schema | CPG-E04 | Pre-Sprint 3 | 2 | CRITICAL |
+| CPG-032 | Fix: Define `slv_freshsip.pipeline_dq_log` schema and DQ monitoring table | CPG-E08 | Sprint 1 | 2 | HIGH |
+| CPG-033 | Fix: Correct KPI-I02 SQL alias error and add warehouse_id to KPI-I03 DSI subquery | CPG-E02 | Pre-Sprint 3 | 1 | HIGH |
+| CPG-034 | Fix: Standardize alert flag naming (`_warn_flag` → `_alert_flag`) across all Gold DDLs | CPG-E06 | Pre-Sprint 3 | 1 | HIGH |
+| CPG-035 | Design: Stateful `consecutive_weeks_in_worst10` counter logic for KPI-D04 | CPG-E04 | Pre-Sprint 3 | 3 | HIGH |
+| CPG-036 | Validate: Confirm ERP customer CSV contains spend allocation columns for KPI-C02 CAC | CPG-E05 | Sprint 2 | 1 | HIGH |
+| CPG-037 | Fix: Implement prior-period rank lookback for KPI-C01 `rank_movement` column | CPG-E05 | Sprint 4 | 2 | MEDIUM |
 
 ---
 

@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://freshsip.internal/schemas/bronze/erp_products",
+  "title": "ERP Product Master — Bronze Source Schema",
+  "description": "JSON Schema for validating raw ERP product master data from daily CSV files before ingestion into brz_freshsip.erp_products_raw. SCD Type 2 history is applied in the Silver layer. Changes to standard_cost_per_unit are tracked to ensure accurate historical gross margin calculations.",
+  "type": "object",
+  "required": [
+    "sku_id",
+    "product_name",
+    "product_category",
+    "brand",
+    "packaging_type",
+    "standard_cost_per_unit",
+    "list_price",
+    "price_tier",
+    "is_active",
+    "record_effective_date"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "sku_id": {
+      "type": "string",
+      "description": "Unique FreshSip product SKU identifier; business key for SCD Type 2 in Silver; referenced by all sales, inventory, and production records",
+      "minLength": 1,
+      "pattern": "^SKU-[A-Z0-9-]+$",
+      "examples": ["SKU-CSD-001", "SKU-FW-002", "SKU-ED-003", "SKU-JB-001"]
+    },
+    "product_name": {
+      "type": "string",
+      "description": "Full product name as it appears in ERP and on the dashboard",
+      "minLength": 1,
+      "examples": ["FreshSip Cola Original 355ml Can", "FreshSip Lemon Sparkling Water 500ml Bottle"]
+    },
+    "product_category": {
+      "type": "string",
+      "description": "Top-level product category; FreshSip has exactly four categories; used in all category-level KPI aggregations",
+      "enum": [
+        "Carbonated Soft Drinks",
+        "Flavored Water",
+        "Energy Drinks",
+        "Juice Blends"
+      ],
+      "examples": ["Carbonated Soft Drinks", "Flavored Water", "Energy Drinks", "Juice Blends"]
+    },
+    "product_subcategory": {
+      "type": "string",
+      "description": "Subcategory within the product category; informational; not used in KPI grouping",
+      "examples": ["Cola", "Citrus Sparkling", "Fruit Punch", "Green Tea Blend"]
+    },
+    "brand": {
+      "type": "string",
+      "description": "Brand name for this SKU; FreshSip may have multiple sub-brands",
+      "minLength": 1,
+      "examples": ["FreshSip Classic", "FreshSip Pure", "FreshSip Rush"]
+    },
+    "packaging_type": {
+      "type": "string",
+      "description": "Primary packaging format for this SKU",
+      "enum": ["Can", "Bottle", "Carton", "Keg"],
+      "examples": ["Can", "Bottle", "Carton"]
+    },
+    "package_size_ml": {
+      "type": "string",
+      "description": "Package volume in milliliters; cast to INTEGER in Silver",
+      "pattern": "^[1-9][0-9]*$",
+      "examples": ["355", "500", "1000", "2000"]
+    },
+    "standard_cost_per_unit": {
+      "type": "string",
+      "description": "Standard cost per unit in USD as defined in ERP; critical for gross margin (KPI-S04) and inventory value calculations; changes trigger SCD Type 2 update in Silver; cast to DECIMAL",
+      "pattern": "^[0-9]+(\\.[0-9]{1,4})?$",
+      "examples": ["0.85", "1.20", "2.50", "1.75"]
+    },
+    "list_price": {
+      "type": "string",
+      "description": "Standard list price per unit in USD; wholesale invoice price baseline; cast to DECIMAL in Silver",
+      "pattern": "^[0-9]+(\\.[0-9]{1,4})?$",
+      "examples": ["2.99", "3.50", "4.99", "1.89"]
+    },
+    "price_tier": {
+      "type": "string",
+      "description": "Price tier classification for this SKU; used for segment-level analysis",
+      "enum": ["Economy", "Standard", "Premium"],
+      "examples": ["Economy", "Standard", "Premium"]
+    },
+    "is_active": {
+      "type": "string",
+      "description": "Whether this SKU is currently active and available for sale; cast to BOOLEAN in Silver; inactive SKUs excluded from reorder alerts",
+      "enum": ["true", "false", "TRUE", "FALSE", "1", "0"],
+      "examples": ["true", "false"]
+    },
+    "record_effective_date": {
+      "type": "string",
+      "description": "Date from which this version of the product record is effective; required for SCD Type 2 processing in Silver; cost or pricing changes on this date trigger a new version",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "examples": ["2026-04-05", "2026-01-01", "2025-07-01"]
+    }
+  }
+}

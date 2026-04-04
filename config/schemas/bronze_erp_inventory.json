@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://freshsip.internal/schemas/bronze/erp_inventory",
+  "title": "ERP Inventory Snapshot — Bronze Source Schema",
+  "description": "JSON Schema for validating raw ERP daily inventory snapshot records before ingestion into brz_freshsip.erp_inventory_raw. One record per SKU per warehouse per daily export.",
+  "type": "object",
+  "required": [
+    "warehouse_id",
+    "sku_id",
+    "units_on_hand",
+    "snapshot_date"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "warehouse_id": {
+      "type": "string",
+      "description": "FreshSip warehouse identifier; references the warehouse dimension",
+      "minLength": 1,
+      "examples": ["WH-NE-001", "WH-SE-003", "WH-MW-002"]
+    },
+    "sku_id": {
+      "type": "string",
+      "description": "FreshSip product SKU identifier; references the product master",
+      "minLength": 1,
+      "examples": ["SKU-CSD-001", "SKU-FW-002"]
+    },
+    "units_on_hand": {
+      "type": "string",
+      "description": "Current physical units in the warehouse; cast to INTEGER in Silver; must be >= 0",
+      "pattern": "^[0-9]+$",
+      "examples": ["1200", "0", "5000"]
+    },
+    "units_in_transit": {
+      "type": "string",
+      "description": "Units in transit to this warehouse from production or other warehouses; cast to INTEGER in Silver",
+      "pattern": "^[0-9]*$",
+      "examples": ["500", "0", "1200"]
+    },
+    "units_reserved": {
+      "type": "string",
+      "description": "Units reserved for pending orders but not yet shipped; cast to INTEGER in Silver",
+      "pattern": "^[0-9]*$",
+      "examples": ["240", "0"]
+    },
+    "snapshot_date": {
+      "type": "string",
+      "description": "Calendar date of the inventory snapshot; cast to DATE in Silver",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "examples": ["2026-04-05"]
+    },
+    "snapshot_timestamp": {
+      "type": "string",
+      "description": "Full timestamp of when the snapshot was taken by ERP; cast to TIMESTAMP in Silver",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}",
+      "examples": ["2026-04-05T06:00:00", "2026-04-05T06:00:00Z"]
+    },
+    "reorder_point_units": {
+      "type": "string",
+      "description": "Reorder threshold for this SKU at this warehouse; loaded into ref_reorder_points in Silver; cast to INTEGER",
+      "pattern": "^[1-9][0-9]*$",
+      "examples": ["200", "500", "1000"]
+    },
+    "standard_cost_per_unit": {
+      "type": "string",
+      "description": "Standard cost per unit in USD from ERP; used to compute inventory_value in Silver; cast to DECIMAL",
+      "pattern": "^[0-9]+(\\.[0-9]{1,4})?$",
+      "examples": ["1.20", "0.85", "2.50"]
+    }
+  }
+}

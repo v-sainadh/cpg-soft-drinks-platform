@@ -1,0 +1,151 @@
+flowchart TD
+    subgraph SOURCES["Data Sources"]
+        S1["POS Transactions\nJSON — Hourly"]
+        S2["ERP Sales Orders\nCSV — Daily"]
+        S3["ERP Returns\nCSV — Daily"]
+        S4["ERP Inventory Snapshots\nCSV — Daily"]
+        S5["IoT Production Sensors\nCSV/JSON — 5-min micro-batch"]
+        S6["Logistics Shipments\nCSV — Daily"]
+        S7["Customer/Retailer ERP\nCSV — Daily"]
+        S8["Product Master ERP\nCSV — Daily"]
+    end
+
+    subgraph BRONZE["Bronze Layer — brz_freshsip (Hive DB)"]
+        B1["brz_freshsip.pos_transactions_raw"]
+        B2["brz_freshsip.erp_sales_raw"]
+        B3["brz_freshsip.erp_returns_raw"]
+        B4["brz_freshsip.erp_inventory_raw"]
+        B5["brz_freshsip.iot_sensor_events_raw"]
+        B6["brz_freshsip.logistics_shipments_raw"]
+        B7["brz_freshsip.erp_customers_raw"]
+        B8["brz_freshsip.erp_products_raw"]
+    end
+
+    subgraph SILVER["Silver Layer — slv_freshsip (Hive DB)"]
+        SV1["slv_freshsip.sales_transactions"]
+        SV2["slv_freshsip.sales_returns"]
+        SV3["slv_freshsip.sales_spend"]
+        SV4["slv_freshsip.inventory_stock"]
+        SV5["slv_freshsip.ref_reorder_points"]
+        SV6["slv_freshsip.production_batches"]
+        SV7["slv_freshsip.production_events"]
+        SV8["slv_freshsip.shipments"]
+        SV9["slv_freshsip.customers"]
+        SV10["slv_freshsip.products"]
+        SV11["slv_freshsip.ref_products"]
+    end
+
+    subgraph GOLD["Gold Layer — gld_freshsip (Hive DB)"]
+        direction TB
+        subgraph DIMS["Shared Dimensions"]
+            D1["gld_freshsip.dim_date"]
+            D2["gld_freshsip.dim_product"]
+            D3["gld_freshsip.dim_customer"]
+            D4["gld_freshsip.dim_warehouse"]
+            D5["gld_freshsip.dim_region"]
+            D6["gld_freshsip.dim_channel"]
+        end
+        subgraph FACTS["Fact Tables"]
+            F1["gld_freshsip.fact_sales"]
+            F2["gld_freshsip.fact_inventory_snapshot"]
+            F3["gld_freshsip.fact_production_batch"]
+            F4["gld_freshsip.fact_shipment"]
+        end
+        subgraph KPIS["KPI Tables"]
+            K1["sales_daily_revenue (S01)"]
+            K2["sales_period_comparison (S02/S03)"]
+            K3["sales_gross_margin_sku (S04)"]
+            K4["inventory_stock_levels (I01/I04)"]
+            K5["inventory_turnover (I02)"]
+            K6["inventory_dsi (I03)"]
+            K7["production_yield (P01)"]
+            K8["production_quality (P02)"]
+            K9["production_downtime (P03)"]
+            K10["production_traceability (P04)"]
+            K11["distribution_otd (D01)"]
+            K12["distribution_fulfillment (D02)"]
+            K13["distribution_cost (D03)"]
+            K14["distribution_route_performance (D04)"]
+            K15["customers_top_retailers (C01)"]
+            K16["customers_cac (C02)"]
+            K17["customers_retention (C03)"]
+            K18["customers_concentration_risk (C04)"]
+        end
+    end
+
+    subgraph DASH["Dashboard — Databricks AI/BI"]
+        DA1["Sales View"]
+        DA2["Inventory View"]
+        DA3["Production View"]
+        DA4["Distribution View"]
+        DA5["Customer View"]
+        DA6["Genie NL Query (Stretch)"]
+    end
+
+    S1 --> B1
+    S2 --> B2
+    S3 --> B3
+    S4 --> B4
+    S5 --> B5
+    S6 --> B6
+    S7 --> B7
+    S8 --> B8
+
+    B1 --> SV1
+    B2 --> SV1
+    B3 --> SV2
+    B3 --> SV3
+    B4 --> SV4
+    B4 --> SV5
+    B5 --> SV6
+    B5 --> SV7
+    B6 --> SV8
+    B7 --> SV9
+    B8 --> SV10
+    B8 --> SV11
+
+    SV1 --> F1
+    SV2 --> F1
+    SV4 --> F2
+    SV6 --> F3
+    SV7 --> SV8
+    SV8 --> F4
+
+    F1 --> K1
+    F1 --> K2
+    F1 --> K3
+    F2 --> K4
+    F2 --> K5
+    F2 --> K6
+    F3 --> K7
+    F3 --> K8
+    F3 --> K9
+    F3 --> K10
+    F4 --> K11
+    F4 --> K12
+    F4 --> K13
+    F4 --> K14
+    F1 --> K15
+    SV9 --> K16
+    SV9 --> K17
+    K15 --> K18
+
+    K1 --> DA1
+    K2 --> DA1
+    K3 --> DA1
+    K4 --> DA2
+    K5 --> DA2
+    K6 --> DA2
+    K7 --> DA3
+    K8 --> DA3
+    K9 --> DA3
+    K10 --> DA3
+    K11 --> DA4
+    K12 --> DA4
+    K13 --> DA4
+    K14 --> DA4
+    K15 --> DA5
+    K16 --> DA5
+    K17 --> DA5
+    K18 --> DA5
+    KPIS --> DA6

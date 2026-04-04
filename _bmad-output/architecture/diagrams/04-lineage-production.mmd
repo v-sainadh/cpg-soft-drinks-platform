@@ -1,0 +1,34 @@
+flowchart LR
+    subgraph SOURCES_P["Source Systems"]
+        IOT["IoT Production Sensors\nCSV/JSON / 5-min micro-batch\n/mnt/landing/iot/"]
+    end
+
+    subgraph BRONZE_P["Bronze — brz_freshsip"]
+        B_IOT["iot_sensor_events_raw\n- All columns as STRING\n- Append-only micro-batch\n- Partition: ingestion_date"]
+    end
+
+    subgraph SILVER_P["Silver — slv_freshsip"]
+        SV_BATCH["production_batches\n- One row per batch_id\n- Aggregated from events\n- yield_rate_pct computed\n- MERGE upsert on batch_id\n- Partition: batch_date"]
+        SV_EVENTS["production_events\n- One row per event_id\n- downtime_hours computed\n- Append-only\n- Partition: event_date"]
+    end
+
+    subgraph GOLD_P["Gold — gld_freshsip"]
+        G_YIELD["production_yield\nKPI-P01\nactual_output / expected_output * 100\nPer batch, MERGE upsert"]
+        G_QC["production_quality\nKPI-P02\nSUM(PASS) / COUNT(batch_id) * 100\nDaily by line + category"]
+        G_DT["production_downtime\nKPI-P03\nSUM(downtime_end - downtime_start) / 3600\nDaily by production_line_id"]
+        G_TRACE["production_traceability\nKPI-P04\nbatch -> shipment -> retailer chain\nDaily completeness check"]
+    end
+
+    subgraph DIST_REF["Distribution Silver - cross-domain"]
+        SV_SHIP2["shipments\n- shipment_id\n- retailer_id\n- batch_id linkage via order_id"]
+    end
+
+    IOT --> B_IOT
+    B_IOT --> SV_BATCH
+    B_IOT --> SV_EVENTS
+
+    SV_BATCH --> G_YIELD
+    SV_BATCH --> G_QC
+    SV_EVENTS --> G_DT
+    SV_BATCH --> G_TRACE
+    SV_SHIP2 --> G_TRACE

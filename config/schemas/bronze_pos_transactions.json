@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://freshsip.internal/schemas/bronze/pos_transactions",
+  "title": "POS Transaction — Bronze Source Schema",
+  "description": "JSON Schema for validating raw POS transaction records before ingestion into brz_freshsip.pos_transactions_raw. All fields are expected as strings in the raw JSON source.",
+  "type": "object",
+  "required": [
+    "transaction_id",
+    "retailer_id",
+    "sku_id",
+    "quantity",
+    "unit_price",
+    "transaction_timestamp",
+    "channel"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "transaction_id": {
+      "type": "string",
+      "description": "Unique POS transaction identifier assigned by the retailer POS system",
+      "minLength": 1,
+      "examples": ["TXN-20260405-001234"]
+    },
+    "retailer_id": {
+      "type": "string",
+      "description": "FreshSip retailer account identifier; must reference a known account in the customer master",
+      "minLength": 1,
+      "pattern": "^RTL-[A-Z0-9]+$",
+      "examples": ["RTL-001", "RTL-WALMART-NE"]
+    },
+    "sku_id": {
+      "type": "string",
+      "description": "FreshSip product SKU identifier; must reference a known product in the product master",
+      "minLength": 1,
+      "pattern": "^SKU-[A-Z0-9-]+$",
+      "examples": ["SKU-CSD-001", "SKU-FW-002"]
+    },
+    "quantity": {
+      "type": "string",
+      "description": "Number of units sold; cast to INTEGER in Silver layer; must be a positive integer string",
+      "pattern": "^[1-9][0-9]*$",
+      "examples": ["12", "144", "1"]
+    },
+    "unit_price": {
+      "type": "string",
+      "description": "Invoice price per unit in USD; cast to DECIMAL in Silver layer",
+      "pattern": "^[0-9]+(\\.[0-9]{1,4})?$",
+      "examples": ["2.99", "14.50", "1.25"]
+    },
+    "transaction_timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp of the transaction; cast to TIMESTAMP in Silver layer",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}",
+      "examples": ["2026-04-05T14:30:00", "2026-04-05T14:30:00Z", "2026-04-05T14:30:00-05:00"]
+    },
+    "channel": {
+      "type": "string",
+      "description": "Distribution channel through which the sale occurred",
+      "enum": ["Retail", "Wholesale", "DTC"],
+      "examples": ["Retail", "Wholesale", "DTC"]
+    },
+    "region": {
+      "type": "string",
+      "description": "US geographic region of the transaction",
+      "enum": ["Northeast", "Southeast", "Midwest", "Southwest", "West"],
+      "examples": ["Northeast", "Southeast"]
+    },
+    "state": {
+      "type": "string",
+      "description": "US state code (2-character ISO 3166-2 format)",
+      "pattern": "^[A-Z]{2}$",
+      "minLength": 2,
+      "maxLength": 2,
+      "examples": ["NY", "CA", "TX"]
+    },
+    "store_id": {
+      "type": "string",
+      "description": "Retailer's internal store location identifier; informational only",
+      "examples": ["STORE-001", "NYC-MIDTOWN-01"]
+    }
+  }
+}
