@@ -1,0 +1,157 @@
+# ==============================================================================
+# Secrets & Credentials
+# ==============================================================================
+
+# Environment variable files
+.env
+.env.*
+!.env.example
+*.env
+
+# API keys, tokens, secrets
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cer
+secrets.json
+secrets.yaml
+secrets.yml
+*secrets*
+*credentials*
+*token*
+!*token*.py
+!*token*.md
+
+# Databricks config with credentials
+.databrickscfg
+databricks.cfg
+
+# AWS credentials
+.aws/credentials
+.aws/config
+
+# ==============================================================================
+# MCP & Claude Code — Local-only config
+# ==============================================================================
+
+# MCP server config (contains workspace URLs, local binary paths)
+.mcp.json
+# Claude Code MCP discovery file at repo root
+mcp.json
+
+# Claude Code local settings (machine-specific, may contain personal config)
+.claude/settings.local.json
+
+# ==============================================================================
+# Python
+# ==============================================================================
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.Python
+
+# Compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+MANIFEST
+
+# Test & coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+.pytype/
+
+# ==============================================================================
+# Jupyter / Databricks Notebooks
+# ==============================================================================
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# ==============================================================================
+# IDE & Editors
+# ==============================================================================
+
+# VS Code — keep workspace settings, ignore personal/local overrides
+.vscode/settings.json
+.vscode/launch.json
+.vscode/*.code-workspace
+!.vscode/extensions.json
+
+# JetBrains / PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# ==============================================================================
+# OS
+# ==============================================================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==============================================================================
+# Logs & Temp
+# ==============================================================================
+
+*.log
+logs/
+tmp/
+temp/
+.tmp/
+
+# ==============================================================================
+# Data files — do not commit raw/sensitive data
+# ==============================================================================
+
+# Large data files
+*.csv
+*.parquet
+*.avro
+*.orc
+
+# Synthetic data generated locally
+data/synthetic/**
+!data/synthetic/.gitkeep
+
+# ==============================================================================
+# Databricks Asset Bundles (DABs)
+# ==============================================================================
+
+# DABs state and lock files
+.databricks/
+bundle.lock
+
+# ==============================================================================
+# Spark / Delta Lake — local checkpoints
+# ==============================================================================
+
+checkpoints/
+spark-warehouse/
+derby.log
+metastore_db/
