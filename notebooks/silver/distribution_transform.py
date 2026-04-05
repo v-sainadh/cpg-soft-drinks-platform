@@ -27,6 +27,9 @@ from pyspark.sql.types import (
 )
 from delta.tables import DeltaTable
 
+import sys
+sys.path.append('/Workspace/FreshSip/src')
+
 from src.utils.logger import get_logger, log_pipeline_start, log_pipeline_end
 from src.utils.config_loader import load_config, get_table_config, get_dq_threshold
 from src.utils.quality_checks import run_quality_checks

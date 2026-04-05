@@ -28,6 +28,9 @@ from pyspark.sql.types import (
     IntegerType, StringType, DateType, BooleanType, StructType, StructField
 )
 
+import sys
+sys.path.append('/Workspace/FreshSip/src')
+
 from src.utils.logger import get_logger, log_pipeline_start, log_pipeline_end
 from src.utils.config_loader import load_config, get_table_config
 

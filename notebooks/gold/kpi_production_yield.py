@@ -25,6 +25,9 @@ from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql import functions as F
 from pyspark.sql.types import DecimalType
 
+import sys
+sys.path.append('/Workspace/FreshSip/src')
+
 from src.utils.logger import get_logger, log_pipeline_start, log_pipeline_end
 from src.utils.config_loader import load_config, get_table_config
 
