@@ -1,0 +1,85 @@
+---
+# FreshSip Beverages — Pipeline Configuration
+# All pipeline modules must load settings from this file via src/utils/config_loader.py.
+# NO hardcoded table names, file paths, or thresholds in pipeline code.
+
+layers:
+  bronze:
+    database: brz_freshsip
+    checkpoint_base: /tmp/checkpoints/bronze
+  silver:
+    database: slv_freshsip
+    checkpoint_base: /tmp/checkpoints/silver
+  gold:
+    database: gld_freshsip
+
+sources:
+  erp:
+    base_path: data/synthetic/erp
+    format: csv
+    options:
+      header: "true"
+      inferSchema: "false"
+  pos:
+    base_path: data/synthetic/pos
+    format: json
+    options:
+      multiline: "false"
+  production:
+    base_path: data/synthetic/production
+    format: json
+    options:
+      multiline: "false"
+  logistics:
+    base_path: data/synthetic/logistics
+    format: csv
+    options:
+      header: "true"
+      inferSchema: "false"
+
+tables:
+  bronze:
+    pos_transactions:     brz_freshsip.pos_transactions_raw
+    erp_sales:            brz_freshsip.erp_sales_raw
+    erp_returns:          brz_freshsip.erp_returns_raw
+    erp_inventory:        brz_freshsip.erp_inventory_raw
+    iot_sensor_events:    brz_freshsip.iot_sensor_events_raw
+    logistics_shipments:  brz_freshsip.logistics_shipments_raw
+    erp_customers:        brz_freshsip.erp_customers_raw
+    erp_products:         brz_freshsip.erp_products_raw
+    erp_warehouses:       brz_freshsip.erp_warehouses_raw
+  silver:
+    sales_transactions:   slv_freshsip.sales_transactions
+    sales_returns:        slv_freshsip.sales_returns
+    inventory_stock:      slv_freshsip.inventory_stock
+    ref_reorder_points:   slv_freshsip.ref_reorder_points
+    production_batches:   slv_freshsip.production_batches
+    production_events:    slv_freshsip.production_events
+    shipments:            slv_freshsip.shipments
+    customers:            slv_freshsip.customers
+    products:             slv_freshsip.ref_products
+    warehouses:           slv_freshsip.ref_warehouses
+    dq_rejected_records:  slv_freshsip.dq_rejected_records
+  gold:
+    dim_date:             gld_freshsip.dim_date
+    dim_product:          gld_freshsip.dim_product
+    dim_customer:         gld_freshsip.dim_customer
+    dim_warehouse:        gld_freshsip.dim_warehouse
+    fact_sales:           gld_freshsip.fact_sales
+    fact_inventory:       gld_freshsip.fact_inventory_snapshot
+    fact_production:      gld_freshsip.fact_production_batch
+    fact_shipment:        gld_freshsip.fact_shipment
+    kpi_daily_revenue:    gld_freshsip.kpi_daily_revenue
+    kpi_inv_turnover:     gld_freshsip.kpi_inventory_turnover
+    kpi_prod_yield:       gld_freshsip.kpi_production_yield
+    kpi_fulfillment:      gld_freshsip.kpi_fulfillment_rate
+
+thresholds:
+  # Pipeline halts if BLOCKER DQ failures exceed this % of the batch
+  dq_fail_rate_pct: 5.0
+  max_records_per_batch: 1000000
+
+date_spine:
+  # Date dimension generated for this range
+  start_year: 2023
+  end_year:   2027

@@ -1,0 +1,251 @@
+{
+  "_metadata": {
+    "dashboard_id": "01f130b425881effbe2764e57e0feba6",
+    "dashboard_url": "https://dbc-2ed6d9c9-8532.cloud.databricks.com/sql/dashboardsv3/01f130b425881effbe2764e57e0feba6",
+    "display_name": "FreshSip Executive Dashboard",
+    "parent_path": "/Shared/freshsip",
+    "workspace_path": "/Shared/freshsip/FreshSip Executive Dashboard.lvdash.json",
+    "warehouse_id": "564f84c9661115a3",
+    "deployed_date": "2026-04-05",
+    "deployed_by": "Deployer Agent",
+    "status": "published"
+  },
+  "datasets": [
+    {
+      "name": "ds_kpi_mtd",
+      "displayName": "KPI Cards MTD",
+      "queryLines": [
+        "SELECT COALESCE(SUM(kr.total_revenue), 0) AS revenue_mtd, ",
+        "ROUND(AVG(ki.inventory_turnover_rate), 2) AS avg_inventory_turnover, ",
+        "ROUND(AVG(kp.avg_yield_rate_pct), 1) AS avg_yield_rate_pct, ",
+        "ROUND(AVG(kf.fulfillment_rate_pct), 1) AS avg_on_time_pct ",
+        "FROM gld_freshsip.kpi_daily_revenue kr ",
+        "LEFT JOIN gld_freshsip.kpi_inventory_turnover ki ON kr.report_date = ki.report_date ",
+        "LEFT JOIN gld_freshsip.kpi_production_yield kp ON kr.report_date = kp.report_date ",
+        "LEFT JOIN gld_freshsip.kpi_fulfillment_rate kf ON kr.report_date = kf.report_date ",
+        "WHERE kr.report_date >= DATE_TRUNC('MONTH', CURRENT_DATE())"
+      ]
+    },
+    {
+      "name": "ds_revenue_by_category",
+      "displayName": "Revenue by Category",
+      "queryLines": [
+        "SELECT report_date, product_category, ",
+        "SUM(total_revenue) AS total_revenue, ",
+        "SUM(total_gross_margin) AS total_gross_margin, ",
+        "SUM(units_sold) AS units_sold ",
+        "FROM gld_freshsip.kpi_daily_revenue ",
+        "WHERE report_date >= date_sub(CURRENT_DATE(), 30) ",
+        "AND product_category IS NOT NULL ",
+        "GROUP BY report_date, product_category ",
+        "ORDER BY report_date DESC, total_revenue DESC"
+      ]
+    },
+    {
+      "name": "ds_revenue_by_region",
+      "displayName": "Revenue by Region",
+      "queryLines": [
+        "SELECT report_date, region, ",
+        "SUM(total_revenue) AS total_revenue, ",
+        "SUM(units_sold) AS units_sold ",
+        "FROM gld_freshsip.kpi_daily_revenue ",
+        "WHERE report_date >= date_sub(CURRENT_DATE(), 30) ",
+        "AND region IS NOT NULL AND region != '' ",
+        "GROUP BY report_date, region ",
+        "ORDER BY report_date DESC, region"
+      ]
+    },
+    {
+      "name": "ds_inventory_heatmap",
+      "displayName": "Inventory Heatmap",
+      "queryLines": [
+        "SELECT dw.warehouse_name, dw.region AS warehouse_region, dp.product_category, ",
+        "SUM(fi.quantity_on_hand) AS total_units, ",
+        "ROUND(SUM(fi.quantity_on_hand * dp.standard_cost_per_unit), 2) AS inventory_value, ",
+        "ROUND(AVG(fi.days_of_supply), 1) AS avg_days_of_supply ",
+        "FROM gld_freshsip.fact_inventory_snapshot fi ",
+        "JOIN gld_freshsip.dim_warehouse dw ON fi.warehouse_key = dw.warehouse_key ",
+        "JOIN gld_freshsip.dim_product dp ON fi.product_key = dp.product_key ",
+        "JOIN gld_freshsip.dim_date dd ON fi.date_key = dd.date_key ",
+        "WHERE dd.full_date = (SELECT MAX(full_date) FROM gld_freshsip.dim_date WHERE full_date <= CURRENT_DATE()) ",
+        "GROUP BY dw.warehouse_name, dw.region, dp.product_category ",
+        "ORDER BY inventory_value DESC"
+      ]
+    },
+    {
+      "name": "ds_days_of_supply",
+      "displayName": "Days of Supply by Warehouse",
+      "queryLines": [
+        "SELECT dw.warehouse_name, ",
+        "ROUND(AVG(fi.days_of_supply), 1) AS avg_days_of_supply, ",
+        "MIN(fi.days_of_supply) AS min_days_of_supply, ",
+        "MAX(fi.days_of_supply) AS max_days_of_supply, ",
+        "SUM(CASE WHEN fi.days_of_supply < 7 THEN 1 ELSE 0 END) AS low_stock_skus ",
+        "FROM gld_freshsip.fact_inventory_snapshot fi ",
+        "JOIN gld_freshsip.dim_warehouse dw ON fi.warehouse_key = dw.warehouse_key ",
+        "JOIN gld_freshsip.dim_date dd ON fi.date_key = dd.date_key ",
+        "WHERE dd.full_date = (SELECT MAX(full_date) FROM gld_freshsip.dim_date WHERE full_date <= CURRENT_DATE()) ",
+        "GROUP BY dw.warehouse_name ",
+        "ORDER BY avg_days_of_supply"
+      ]
+    },
+    {
+      "name": "ds_yield_by_line",
+      "displayName": "Production Yield by Line",
+      "queryLines": [
+        "SELECT report_date, production_line_id, batch_count, ",
+        "avg_yield_rate_pct, min_yield_rate_pct, max_yield_rate_pct, ",
+        "qc_pass_rate_pct, total_downtime_hours ",
+        "FROM gld_freshsip.kpi_production_yield ",
+        "WHERE report_date >= date_sub(CURRENT_DATE(), 30) ",
+        "ORDER BY report_date DESC, production_line_id"
+      ]
+    },
+    {
+      "name": "ds_fulfillment_rate",
+      "displayName": "Fulfillment Rate by Channel",
+      "queryLines": [
+        "SELECT report_date, channel, region, total_shipments, ",
+        "on_time_delivery_pct, fulfillment_rate_pct, total_cases_delivered ",
+        "FROM gld_freshsip.kpi_fulfillment_rate ",
+        "WHERE report_date >= date_sub(CURRENT_DATE(), 30) ",
+        "AND channel IS NOT NULL AND channel != '' ",
+        "ORDER BY report_date DESC, channel, region"
+      ]
+    },
+    {
+      "name": "ds_top_customers",
+      "displayName": "Top 10 Customers",
+      "queryLines": [
+        "SELECT dc.retailer_name, dc.retail_segment, dc.region, dc.channel, ",
+        "ROUND(SUM(fs.net_revenue), 2) AS total_revenue, ",
+        "COUNT(DISTINCT fs.transaction_key) AS transaction_count, ",
+        "ROUND(AVG(fs.net_revenue), 2) AS avg_transaction_value ",
+        "FROM gld_freshsip.fact_sales fs ",
+        "JOIN gld_freshsip.dim_customer dc ON fs.customer_key = dc.customer_key ",
+        "JOIN gld_freshsip.dim_date dd ON fs.date_key = dd.date_key ",
+        "WHERE dd.full_date >= date_sub(CURRENT_DATE(), 30) ",
+        "GROUP BY dc.retailer_name, dc.retail_segment, dc.region, dc.channel ",
+        "ORDER BY total_revenue DESC ",
+        "LIMIT 10"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "executive-overview",
+      "displayName": "Executive Overview",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {"name": "title", "multilineTextboxSpec": {"lines": ["## FreshSip Executive Dashboard"]}},
+          "position": {"x": 0, "y": 0, "width": 6, "height": 1}
+        },
+        {
+          "widget": {"name": "subtitle", "multilineTextboxSpec": {"lines": ["Revenue, Inventory, Production and Fulfillment KPIs — Month to Date"]}},
+          "position": {"x": 0, "y": 1, "width": 6, "height": 1}
+        },
+        {
+          "widget": {"name": "kpi-section-header", "multilineTextboxSpec": {"lines": ["### Month-to-Date KPI Summary"]}},
+          "position": {"x": 0, "y": 2, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "kpi-revenue-mtd",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_kpi_mtd", "fields": [{"name": "revenue_mtd", "expression": "`revenue_mtd`"}], "disaggregated": true}}],
+            "spec": {"version": 2, "widgetType": "counter", "encodings": {"value": {"fieldName": "revenue_mtd", "displayName": "Revenue MTD ($)"}}, "frame": {"showTitle": true, "title": "Revenue MTD"}}
+          },
+          "position": {"x": 0, "y": 3, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-inventory-turnover",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_kpi_mtd", "fields": [{"name": "avg_inventory_turnover", "expression": "`avg_inventory_turnover`"}], "disaggregated": true}}],
+            "spec": {"version": 2, "widgetType": "counter", "encodings": {"value": {"fieldName": "avg_inventory_turnover", "displayName": "Avg Inventory Turnover"}}, "frame": {"showTitle": true, "title": "Avg Inventory Turnover"}}
+          },
+          "position": {"x": 2, "y": 3, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-yield-rate",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_kpi_mtd", "fields": [{"name": "avg_yield_rate_pct", "expression": "`avg_yield_rate_pct`"}], "disaggregated": true}}],
+            "spec": {"version": 2, "widgetType": "counter", "encodings": {"value": {"fieldName": "avg_yield_rate_pct", "displayName": "Avg Yield Rate (%)"}}, "frame": {"showTitle": true, "title": "Avg Yield Rate %"}}
+          },
+          "position": {"x": 4, "y": 3, "width": 2, "height": 3}
+        },
+        {
+          "widget": {"name": "revenue-section-header", "multilineTextboxSpec": {"lines": ["### Revenue Trends — Last 30 Days"]}},
+          "position": {"x": 0, "y": 6, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "chart-revenue-by-category",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_revenue_by_category", "fields": [{"name": "report_date", "expression": "`report_date`"}, {"name": "product_category", "expression": "`product_category`"}, {"name": "total_revenue", "expression": "`total_revenue`"}], "disaggregated": true}}],
+            "spec": {"version": 3, "widgetType": "bar", "encodings": {"x": {"fieldName": "report_date", "scale": {"type": "temporal"}, "displayName": "Date"}, "y": {"fieldName": "total_revenue", "scale": {"type": "quantitative"}, "displayName": "Revenue ($)"}, "color": {"fieldName": "product_category", "scale": {"type": "categorical"}, "displayName": "Product Category"}}, "frame": {"showTitle": true, "title": "Daily Revenue by Product Category"}}
+          },
+          "position": {"x": 0, "y": 7, "width": 3, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "chart-revenue-by-region",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_revenue_by_region", "fields": [{"name": "report_date", "expression": "`report_date`"}, {"name": "region", "expression": "`region`"}, {"name": "total_revenue", "expression": "`total_revenue`"}], "disaggregated": true}}],
+            "spec": {"version": 3, "widgetType": "line", "encodings": {"x": {"fieldName": "report_date", "scale": {"type": "temporal"}, "displayName": "Date"}, "y": {"fieldName": "total_revenue", "scale": {"type": "quantitative"}, "displayName": "Revenue ($)"}, "color": {"fieldName": "region", "scale": {"type": "categorical"}, "displayName": "Region"}}, "frame": {"showTitle": true, "title": "Daily Revenue by Region"}}
+          },
+          "position": {"x": 3, "y": 7, "width": 3, "height": 6}
+        },
+        {
+          "widget": {"name": "inventory-section-header", "multilineTextboxSpec": {"lines": ["### Inventory — Current Snapshot"]}},
+          "position": {"x": 0, "y": 13, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "table-inventory-heatmap",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_inventory_heatmap", "fields": [{"name": "warehouse_name", "expression": "`warehouse_name`"}, {"name": "warehouse_region", "expression": "`warehouse_region`"}, {"name": "product_category", "expression": "`product_category`"}, {"name": "total_units", "expression": "`total_units`"}, {"name": "inventory_value", "expression": "`inventory_value`"}, {"name": "avg_days_of_supply", "expression": "`avg_days_of_supply`"}], "disaggregated": true}}],
+            "spec": {"version": 2, "widgetType": "table", "encodings": {"columns": [{"fieldName": "warehouse_name", "displayName": "Warehouse"}, {"fieldName": "warehouse_region", "displayName": "Region"}, {"fieldName": "product_category", "displayName": "Category"}, {"fieldName": "total_units", "displayName": "Units on Hand"}, {"fieldName": "inventory_value", "displayName": "Inventory Value ($)"}, {"fieldName": "avg_days_of_supply", "displayName": "Avg Days of Supply"}]}, "frame": {"showTitle": true, "title": "Inventory Heatmap: Warehouse x Category"}}
+          },
+          "position": {"x": 0, "y": 14, "width": 4, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "table-days-of-supply",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_days_of_supply", "fields": [{"name": "warehouse_name", "expression": "`warehouse_name`"}, {"name": "avg_days_of_supply", "expression": "`avg_days_of_supply`"}, {"name": "min_days_of_supply", "expression": "`min_days_of_supply`"}, {"name": "max_days_of_supply", "expression": "`max_days_of_supply`"}, {"name": "low_stock_skus", "expression": "`low_stock_skus`"}], "disaggregated": true}}],
+            "spec": {"version": 2, "widgetType": "table", "encodings": {"columns": [{"fieldName": "warehouse_name", "displayName": "Warehouse"}, {"fieldName": "avg_days_of_supply", "displayName": "Avg Days of Supply"}, {"fieldName": "min_days_of_supply", "displayName": "Min DOS"}, {"fieldName": "max_days_of_supply", "displayName": "Max DOS"}, {"fieldName": "low_stock_skus", "displayName": "Low Stock SKUs (<7 days)"}]}, "frame": {"showTitle": true, "title": "Days of Supply by Warehouse"}}
+          },
+          "position": {"x": 4, "y": 14, "width": 2, "height": 6}
+        },
+        {
+          "widget": {"name": "production-section-header", "multilineTextboxSpec": {"lines": ["### Production and Fulfillment — Last 30 Days"]}},
+          "position": {"x": 0, "y": 20, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "chart-yield-by-line",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_yield_by_line", "fields": [{"name": "report_date", "expression": "`report_date`"}, {"name": "production_line_id", "expression": "`production_line_id`"}, {"name": "avg_yield_rate_pct", "expression": "`avg_yield_rate_pct`"}], "disaggregated": true}}],
+            "spec": {"version": 3, "widgetType": "line", "encodings": {"x": {"fieldName": "report_date", "scale": {"type": "temporal"}, "displayName": "Date"}, "y": {"fieldName": "avg_yield_rate_pct", "scale": {"type": "quantitative"}, "displayName": "Yield Rate (%)"}, "color": {"fieldName": "production_line_id", "scale": {"type": "categorical"}, "displayName": "Production Line"}}, "frame": {"showTitle": true, "title": "Production Yield Rate by Line"}}
+          },
+          "position": {"x": 0, "y": 21, "width": 3, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "chart-fulfillment-by-channel",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_fulfillment_rate", "fields": [{"name": "channel", "expression": "`channel`"}, {"name": "fulfillment_rate_pct", "expression": "`fulfillment_rate_pct`"}, {"name": "on_time_delivery_pct", "expression": "`on_time_delivery_pct`"}], "disaggregated": true}}],
+            "spec": {"version": 3, "widgetType": "bar", "encodings": {"x": {"fieldName": "channel", "scale": {"type": "categorical"}, "displayName": "Channel"}, "y": {"fields": [{"fieldName": "fulfillment_rate_pct", "displayName": "Fulfillment Rate (%)"}, {"fieldName": "on_time_delivery_pct", "displayName": "On-Time Delivery (%)"}], "scale": {"type": "quantitative"}}, "mark": {"layout": "group"}}, "frame": {"showTitle": true, "title": "Fulfillment and On-Time Delivery by Channel"}}
+          },
+          "position": {"x": 3, "y": 21, "width": 3, "height": 6}
+        },
+        {
+          "widget": {"name": "customers-section-header", "multilineTextboxSpec": {"lines": ["### Top Customers — Last 30 Days"]}},
+          "position": {"x": 0, "y": 27, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "table-top-customers",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_top_customers", "fields": [{"name": "retailer_name", "expression": "`retailer_name`"}, {"name": "retail_segment", "expression": "`retail_segment`"}, {"name": "region", "expression": "`region`"}, {"name": "channel", "expression": "`channel`"}, {"name": "total_revenue", "expression": "`total_revenue`"}, {"name": "transaction_count", "expression": "`transaction_count`"}, {"name": "avg_transaction_value", "expression": "`avg_transaction_value`"}], "disaggregated": true}}],
+            "spec": {"version": 2, "widgetType": "table", "encodings": {"columns": [{"fieldName": "retailer_name", "displayName": "Retailer"}, {"fieldName": "retail_segment", "displayName": "Segment"}, {"fieldName": "region", "displayName": "Region"}, {"fieldName": "channel", "displayName": "Channel"}, {"fieldName": "total_revenue", "displayName": "Total Revenue ($)"}, {"fieldName": "transaction_count", "displayName": "Transactions"}, {"fieldName": "avg_transaction_value", "displayName": "Avg Transaction ($)"}]}, "frame": {"showTitle": true, "title": "Top 10 Customers by Revenue"}}
+          },
+          "position": {"x": 0, "y": 28, "width": 6, "height": 6}
+        }
+      ]
+    }
+  ]
+}

@@ -47,6 +47,50 @@ Before starting any task:
 1. `_bmad-output/project-context.md` — stack, architecture decisions, domains, quality standards
 2. `_bmad-output/architecture/schema-{layer}.md` — exact table schemas to implement
 3. `_bmad-output/architecture/data-quality-rules.md` — quality rules to encode as checks
+
+---
+
+## Jira Lifecycle — Required for Every Task
+
+### PRE-TASK (first thing, before writing any code)
+
+```bash
+# 1. Resolve the ticket (CPG ID given by Team Lead or inferred from context)
+python docs/jira_utils.py find "CPG-XXX"
+
+# 2. Post a start comment
+python docs/jira_utils.py comment SCRUM-NN \
+  "[AGENT: data-engineer] Picking up CPG-XXX. Starting: <1-line description of what will be built>. Layer: <Bronze|Silver|Gold>."
+
+# 3. Move to In Progress
+python docs/jira_utils.py status SCRUM-NN "In Progress"
+```
+
+Report the Jira key back to the Team Lead: "SCRUM-NN moved to In Progress."
+
+### POST-TASK (after all artifacts are written and tests pass)
+
+```bash
+# 1. Post a detailed completion comment
+python docs/jira_utils.py comment SCRUM-NN \
+  "[DONE — YYYY-MM-DD] CPG-XXX complete.
+DELIVERED:
+- src/<layer>/<domain>.py — <what it does>
+- tests/unit/test_<module>.py — <N> test cases, all passing
+- notebooks/<layer>_<domain>.py — notebook export
+
+AC STATUS:
+- AC-1: PASS — <one line>
+- AC-2: PASS — <one line>
+- AC-N: <PASS|DEFERRED> — <note if deferred>
+
+HANDOFF: Sending to code-reviewer. Blocker if review FAILs: do not deploy."
+
+# 2. Move to In Review (code-reviewer picks up from here)
+python docs/jira_utils.py status SCRUM-NN "In Review"
+```
+
+Report to Team Lead: "SCRUM-NN in review. Artifacts: `src/<layer>/<domain>.py`, tests passing."
 4. Relevant `.claude/skills/` files (see table above)
 5. The assigned user story in `_bmad-output/requirements/user-stories.md`
 6. Existing code in `src/` for the same domain (to reuse patterns and utils)

@@ -49,6 +49,61 @@ Before starting any deployment:
 
 ---
 
+## Jira Lifecycle — Required for Every Deployment
+
+### PRE-DEPLOYMENT (before touching the Databricks workspace)
+
+```bash
+# 1. Verify code review PASS — check for "[REVIEW: PASS" in ticket comments
+python docs/jira_utils.py info SCRUM-NN
+# If no PASS comment found, STOP and alert Team Lead. Do NOT deploy unreviewed code.
+
+# 2. Post a start comment
+python docs/jira_utils.py comment SCRUM-NN \
+  "[AGENT: deployer] Starting deployment of CPG-XXX. Resources: <list pipelines/jobs/tables>. Environment: dev."
+
+# 3. Move to In Progress
+python docs/jira_utils.py status SCRUM-NN "In Progress"
+```
+
+Report to Team Lead: "SCRUM-NN deployment starting. Code review PASS confirmed."
+
+### POST-DEPLOYMENT: Success
+
+```bash
+python docs/jira_utils.py comment SCRUM-NN \
+  "[DEPLOYED — YYYY-MM-DD] CPG-XXX deployed successfully.
+RESOURCES CREATED:
+- Workspace: /Shared/freshsip/<layer>/<domain>
+- Pipeline: <pipeline_id> (<name>)
+- Job: <job_id> (<name>), schedule: <cron>
+- Tables: <list with row counts>
+
+SMOKE TEST: PASS — tables exist, job ran, KPI spot check returned non-null values.
+DEPLOYMENT RECORD: docs/deployment/YYYY-MM-DD_<domain>_<layer>.md"
+
+python docs/jira_utils.py close SCRUM-NN
+```
+
+Report to Team Lead: "SCRUM-NN closed. Deployment complete — job ID <id> scheduled."
+
+### POST-DEPLOYMENT: Failure
+
+```bash
+python docs/jira_utils.py comment SCRUM-NN \
+  "[DEPLOY FAILED — YYYY-MM-DD] CPG-XXX deployment failed.
+FAILURE POINT: <step that failed — e.g., Step 7: Job creation>.
+ERROR: <error message>.
+ROLLBACK: <action taken or 'Not needed — nothing was created'>.
+NEXT: Returning to data-engineer for investigation."
+
+python docs/jira_utils.py status SCRUM-NN "In Progress"
+```
+
+Report to Team Lead: "SCRUM-NN deployment FAILED at <step>. Returned to data-engineer."
+
+---
+
 ## Output Artifacts
 
 | Artifact | Path |

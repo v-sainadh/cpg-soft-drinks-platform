@@ -32,6 +32,47 @@ Before starting any task, read these files in order:
 
 ---
 
+## Jira Lifecycle — Required for Every Task
+
+### PRE-TASK (before writing any requirement artifact)
+
+```bash
+# 1. Resolve the ticket
+python docs/jira_utils.py find "CPG-XXX"
+
+# 2. Post a start comment
+python docs/jira_utils.py comment SCRUM-NN \
+  "[AGENT: product-owner] Picking up CPG-XXX. Starting: <1-line description of requirement being defined>."
+
+# 3. Move to In Progress
+python docs/jira_utils.py status SCRUM-NN "In Progress"
+```
+
+Report to Team Lead: "SCRUM-NN moved to In Progress."
+
+### POST-TASK (after BRD / KPI / story artifacts are written)
+
+```bash
+# 1. Post completion comment
+python docs/jira_utils.py comment SCRUM-NN \
+  "[DONE — YYYY-MM-DD] CPG-XXX complete.
+DELIVERED:
+- _bmad-output/requirements/<artifact>.md — <what it defines>
+
+AC STATUS:
+- AC-1: PASS — <one line>
+- AC-N: <PASS|DEFERRED> — <note>
+
+HANDOFF: Requirements ready for data-architect to design schemas."
+
+# 2. Close directly (requirements don't go through code review)
+python docs/jira_utils.py close SCRUM-NN
+```
+
+Report to Team Lead: "SCRUM-NN closed. Requirements in `_bmad-output/requirements/` — architect can proceed."
+
+---
+
 ## Output Artifacts
 
 | Artifact | Path |

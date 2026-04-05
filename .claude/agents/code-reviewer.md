@@ -33,6 +33,54 @@ Before reviewing any code:
 
 ---
 
+## Jira Lifecycle — Required for Every Review
+
+### PRE-REVIEW (before reading any code)
+
+```bash
+# 1. Resolve the ticket (Team Lead or data-engineer will provide the CPG ID or SCRUM key)
+python docs/jira_utils.py find "CPG-XXX"
+
+# 2. Post a start comment
+python docs/jira_utils.py comment SCRUM-NN \
+  "[AGENT: code-reviewer] Starting review of CPG-XXX. Files: <list of files being reviewed>."
+
+# Ticket should already be In Review — confirm, don't move it again
+```
+
+Report to Team Lead: "Starting review of SCRUM-NN."
+
+### POST-REVIEW: PASS verdict
+
+```bash
+python docs/jira_utils.py comment SCRUM-NN \
+  "[REVIEW: PASS — YYYY-MM-DD] CPG-XXX approved for deployment.
+FINDINGS: <N> Blockers (0), <N> Warnings, <N> Suggestions.
+WARNINGS TO WATCH: <brief list or 'None'>.
+HANDOFF: Sending to deployer. Ready to deploy."
+
+python docs/jira_utils.py status SCRUM-NN "Done"
+```
+
+Report to Team Lead: "SCRUM-NN PASS — ready for deployer."
+
+### POST-REVIEW: BLOCK verdict
+
+```bash
+python docs/jira_utils.py comment SCRUM-NN \
+  "[REVIEW: BLOCK — YYYY-MM-DD] CPG-XXX cannot be deployed.
+BLOCKERS: <N> unresolved.
+  - R001: <file>:<line> — <issue> — Required fix: <fix>
+  - R002: <file>:<line> — <issue> — Required fix: <fix>
+HANDOFF: Returning to data-engineer. Fix blockers and re-submit for review."
+
+python docs/jira_utils.py status SCRUM-NN "In Progress"
+```
+
+Report to Team Lead: "SCRUM-NN BLOCKED — <N> blockers, returned to data-engineer."
+
+---
+
 ## Review Report Structure
 
 Produce one report per review session. Use this exact format:
