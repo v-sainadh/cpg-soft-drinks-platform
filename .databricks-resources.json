@@ -6,8 +6,151 @@
       "name": "FreshSip Executive Dashboard",
       "id": "01f130b425881effbe2764e57e0feba6",
       "created_at": "2026-04-05T05:56:11.359872+00:00",
-      "updated_at": "2026-04-05T05:56:11.359872+00:00",
+      "updated_at": "2026-04-05T10:27:30.707837+00:00",
       "url": "https://dbc-2ed6d9c9-8532.cloud.databricks.com/sql/dashboardsv3/01f130b425881effbe2764e57e0feba6"
+    },
+    {
+      "type": "notebook",
+      "name": "bronze/sales_ingestion",
+      "workspace_path": "/FreshSip/bronze/sales_ingestion",
+      "source_path": "src/bronze/sales_ingestion.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "bronze/inventory_ingestion",
+      "workspace_path": "/FreshSip/bronze/inventory_ingestion",
+      "source_path": "src/bronze/inventory_ingestion.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "bronze/production_ingestion",
+      "workspace_path": "/FreshSip/bronze/production_ingestion",
+      "source_path": "src/bronze/production_ingestion.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "bronze/distribution_ingestion",
+      "workspace_path": "/FreshSip/bronze/distribution_ingestion",
+      "source_path": "src/bronze/distribution_ingestion.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "bronze/master_data_ingestion",
+      "workspace_path": "/FreshSip/bronze/master_data_ingestion",
+      "source_path": "src/bronze/master_data_ingestion.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "silver/sales_transform",
+      "workspace_path": "/FreshSip/silver/sales_transform",
+      "source_path": "notebooks/silver/sales_transform.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "silver/inventory_transform",
+      "workspace_path": "/FreshSip/silver/inventory_transform",
+      "source_path": "notebooks/silver/inventory_transform.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "silver/production_transform",
+      "workspace_path": "/FreshSip/silver/production_transform",
+      "source_path": "notebooks/silver/production_transform.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "silver/distribution_transform",
+      "workspace_path": "/FreshSip/silver/distribution_transform",
+      "source_path": "notebooks/silver/distribution_transform.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "silver/master_data_transform",
+      "workspace_path": "/FreshSip/silver/master_data_transform",
+      "source_path": "notebooks/silver/master_data_transform.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "gold/dim_date",
+      "workspace_path": "/FreshSip/gold/dim_date",
+      "source_path": "notebooks/gold/dim_date.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "gold/fact_sales",
+      "workspace_path": "/FreshSip/gold/fact_sales",
+      "source_path": "notebooks/gold/fact_sales.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "gold/fact_inventory_snapshot",
+      "workspace_path": "/FreshSip/gold/fact_inventory_snapshot",
+      "source_path": "notebooks/gold/fact_inventory_snapshot.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "gold/fact_production_batch",
+      "workspace_path": "/FreshSip/gold/fact_production_batch",
+      "source_path": "notebooks/gold/fact_production_batch.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "gold/fact_shipment",
+      "workspace_path": "/FreshSip/gold/fact_shipment",
+      "source_path": "notebooks/gold/fact_shipment.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "gold/kpi_daily_revenue",
+      "workspace_path": "/FreshSip/gold/kpi_daily_revenue",
+      "source_path": "notebooks/gold/kpi_daily_revenue.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "gold/kpi_production_yield",
+      "workspace_path": "/FreshSip/gold/kpi_production_yield",
+      "source_path": "notebooks/gold/kpi_production_yield.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "gold/kpi_fulfillment_rate",
+      "workspace_path": "/FreshSip/gold/kpi_fulfillment_rate",
+      "source_path": "notebooks/gold/kpi_fulfillment_rate.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "notebook",
+      "name": "gold/kpi_inventory_turnover",
+      "workspace_path": "/FreshSip/gold/kpi_inventory_turnover",
+      "source_path": "notebooks/gold/kpi_inventory_turnover.py",
+      "uploaded_at": "2026-04-05T00:00:00+00:00"
+    },
+    {
+      "type": "job",
+      "name": "FreshSip CPG Pipeline",
+      "id": "353781332408323",
+      "schedule": "0 0 6 * * ? (daily 06:00 UTC)",
+      "config_path": "config/databricks/freshsip_cpg_pipeline_job.json",
+      "note": "Job creation blocked by PAT token scope restriction in Databricks Community Edition. Create manually using config_path or generate a new PAT with jobs scope.",
+      "created_at": "2026-04-05T00:00:00+00:00",
+      "updated_at": "2026-04-05T10:58:53.624221+00:00"
     }
   ]
 }

@@ -22,7 +22,7 @@ from pyspark.sql.types import StringType
 # COMMAND ----------
 _CONFIG = {
     "sources": {
-        "logistics": {"base_path": "/Workspace/Users/naninadh.v@gmail.com/freshsip/data/logistics"},
+        "logistics": {"base_path": "/Volumes/workspace/default/freshsip_data/synthetic/logistics"},
     },
     "tables": {
         "bronze": {

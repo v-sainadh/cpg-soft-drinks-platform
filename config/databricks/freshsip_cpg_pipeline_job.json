@@ -1,0 +1,215 @@
+{
+  "name": "FreshSip CPG Pipeline",
+  "tags": {
+    "project": "freshsip-cpg",
+    "env": "dev"
+  },
+  "schedule": {
+    "quartz_cron_expression": "0 0 6 * * ?",
+    "timezone_id": "UTC",
+    "pause_status": "UNPAUSED"
+  },
+  "tasks": [
+    {
+      "task_key": "bronze_sales",
+      "description": "Bronze ingestion - Sales (POS transactions + ERP orders). Writes to brz_freshsip.pos_transactions_raw and brz_freshsip.erp_sales_raw.",
+      "notebook_task": {
+        "notebook_path": "/FreshSip/bronze/sales_ingestion",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "bronze_inventory",
+      "description": "Bronze ingestion - Inventory (ERP inventory snapshots). Writes to brz_freshsip.erp_inventory_raw.",
+      "notebook_task": {
+        "notebook_path": "/FreshSip/bronze/inventory_ingestion",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "bronze_production",
+      "description": "Bronze ingestion - Production (IoT sensor events). Writes to brz_freshsip.iot_sensor_events_raw.",
+      "notebook_task": {
+        "notebook_path": "/FreshSip/bronze/production_ingestion",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "bronze_distribution",
+      "description": "Bronze ingestion - Distribution (logistics shipments). Writes to brz_freshsip.logistics_shipments_raw.",
+      "notebook_task": {
+        "notebook_path": "/FreshSip/bronze/distribution_ingestion",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "bronze_master_data",
+      "description": "Bronze ingestion - Master Data (products, customers, warehouses). Writes to brz_freshsip.erp_products_raw, brz_freshsip.erp_customers_raw, brz_freshsip.erp_warehouses_raw.",
+      "notebook_task": {
+        "notebook_path": "/FreshSip/bronze/master_data_ingestion",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "silver_sales",
+      "description": "Silver transform - Sales transactions (cast, dedup, Delta MERGE upsert). Reads brz_freshsip.pos_transactions_raw. Writes slv_freshsip.sales_transactions.",
+      "depends_on": [
+        {"task_key": "bronze_sales"},
+        {"task_key": "bronze_master_data"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/silver/sales_transform",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "silver_inventory",
+      "description": "Silver transform - Inventory stock + reorder points. Reads brz_freshsip.erp_inventory_raw. Writes slv_freshsip.inventory_stock, slv_freshsip.ref_reorder_points.",
+      "depends_on": [
+        {"task_key": "bronze_inventory"},
+        {"task_key": "bronze_master_data"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/silver/inventory_transform",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "silver_production",
+      "description": "Silver transform - Production batches and events. Reads brz_freshsip.iot_sensor_events_raw. Writes slv_freshsip.production_batches, slv_freshsip.production_events.",
+      "depends_on": [
+        {"task_key": "bronze_production"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/silver/production_transform",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "silver_distribution",
+      "description": "Silver transform - Shipments (cast, dedup, on_time_flag). Reads brz_freshsip.logistics_shipments_raw. Writes slv_freshsip.shipments.",
+      "depends_on": [
+        {"task_key": "bronze_distribution"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/silver/distribution_transform",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "silver_master_data",
+      "description": "Silver transform - Products (SCD Type 1), Customers (SCD Type 2), Warehouses (SCD Type 1). Reads erp_products_raw, erp_customers_raw, erp_warehouses_raw. Writes slv_freshsip.ref_products, slv_freshsip.customers, slv_freshsip.ref_warehouses.",
+      "depends_on": [
+        {"task_key": "bronze_master_data"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/silver/master_data_transform",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "gold_dim_date",
+      "description": "Gold - Date Dimension (generated, no Silver source). Writes gld_freshsip.dim_date. Gates all Gold fact tables.",
+      "depends_on": [
+        {"task_key": "silver_sales"},
+        {"task_key": "silver_inventory"},
+        {"task_key": "silver_production"},
+        {"task_key": "silver_distribution"},
+        {"task_key": "silver_master_data"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/gold/dim_date",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "gold_fact_sales",
+      "description": "Gold - Fact Sales (revenue, COGS, gross margin). Joins slv_freshsip.sales_transactions + ref_products + customers + dim_date. Writes gld_freshsip.fact_sales.",
+      "depends_on": [
+        {"task_key": "gold_dim_date"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/gold/fact_sales",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "gold_fact_inventory_snapshot",
+      "description": "Gold - Fact Inventory Snapshot (reorder alerts, DSI). Joins slv_freshsip.inventory_stock + ref_reorder_points + dim_date. Writes gld_freshsip.fact_inventory_snapshot.",
+      "depends_on": [
+        {"task_key": "gold_dim_date"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/gold/fact_inventory_snapshot",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "gold_fact_production_batch",
+      "description": "Gold - Fact Production Batch (yield rate, QC pass, downtime). Joins slv_freshsip.production_batches + production_events + dim_date. Writes gld_freshsip.fact_production_batch.",
+      "depends_on": [
+        {"task_key": "gold_dim_date"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/gold/fact_production_batch",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "gold_fact_shipment",
+      "description": "Gold - Fact Shipment (on-time delivery, fulfillment). Joins slv_freshsip.shipments + customers + dim_date. Writes gld_freshsip.fact_shipment.",
+      "depends_on": [
+        {"task_key": "gold_dim_date"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/gold/fact_shipment",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "gold_kpi_daily_revenue",
+      "description": "Gold KPI - Daily Revenue by Product Category and Region (KPI #1). Reads gld_freshsip.fact_sales + slv_freshsip.ref_products + customers. Writes gld_freshsip.kpi_daily_revenue.",
+      "depends_on": [
+        {"task_key": "gold_fact_sales"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/gold/kpi_daily_revenue",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "gold_kpi_production_yield",
+      "description": "Gold KPI - Production Yield Rate by Batch and Line (KPI #3). Reads gld_freshsip.fact_production_batch. Writes gld_freshsip.kpi_production_yield.",
+      "depends_on": [
+        {"task_key": "gold_fact_production_batch"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/gold/kpi_production_yield",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "gold_kpi_fulfillment_rate",
+      "description": "Gold KPI - Order Fulfillment Rate and On-Time Delivery % (KPIs #4 and #8). Reads gld_freshsip.fact_shipment + slv_freshsip.customers. Writes gld_freshsip.kpi_fulfillment_rate.",
+      "depends_on": [
+        {"task_key": "gold_fact_shipment"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/gold/kpi_fulfillment_rate",
+        "source": "WORKSPACE"
+      }
+    },
+    {
+      "task_key": "gold_kpi_inventory_turnover",
+      "description": "Gold KPI - Inventory Turnover Rate by Warehouse (KPI #2). Reads gld_freshsip.fact_inventory_snapshot + gld_freshsip.fact_sales. Writes gld_freshsip.kpi_inventory_turnover.",
+      "depends_on": [
+        {"task_key": "gold_fact_inventory_snapshot"},
+        {"task_key": "gold_fact_sales"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/FreshSip/gold/kpi_inventory_turnover",
+        "source": "WORKSPACE"
+      }
+    }
+  ]
+}

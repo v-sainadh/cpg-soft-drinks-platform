@@ -35,10 +35,10 @@ _CONFIG = {
         "gold":   {"database": "gld_freshsip"},
     },
     "sources": {
-        "erp":        {"base_path": "/Workspace/Users/naninadh.v@gmail.com/freshsip/data/erp"},
-        "pos":        {"base_path": "/Workspace/Users/naninadh.v@gmail.com/freshsip/data/pos"},
-        "production": {"base_path": "/Workspace/Users/naninadh.v@gmail.com/freshsip/data/production"},
-        "logistics":  {"base_path": "/Workspace/Users/naninadh.v@gmail.com/freshsip/data/logistics"},
+        "erp":        {"base_path": "/Volumes/workspace/default/freshsip_data/synthetic/erp"},
+        "pos":        {"base_path": "/Volumes/workspace/default/freshsip_data/synthetic/pos"},
+        "production": {"base_path": "/Volumes/workspace/default/freshsip_data/synthetic/production"},
+        "logistics":  {"base_path": "/Volumes/workspace/default/freshsip_data/synthetic/logistics"},
     },
     "tables": {
         "bronze": {

@@ -22,7 +22,7 @@ from pyspark.sql.types import StringType
 # COMMAND ----------
 _CONFIG = {
     "sources": {
-        "erp": {"base_path": "/Workspace/Users/naninadh.v@gmail.com/freshsip/data/erp"},
+        "erp": {"base_path": "/Volumes/workspace/default/freshsip_data/synthetic/erp"},
     },
     "tables": {
         "bronze": {

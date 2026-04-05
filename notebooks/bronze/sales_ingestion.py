@@ -28,8 +28,8 @@ from pyspark.sql.types import StringType
 _CONFIG = {
     "layers": {"bronze": {"database": "brz_freshsip"}},
     "sources": {
-        "erp": {"base_path": "/Workspace/Users/naninadh.v@gmail.com/freshsip/data/erp"},
-        "pos": {"base_path": "/Workspace/Users/naninadh.v@gmail.com/freshsip/data/pos"},
+        "erp": {"base_path": "/Volumes/workspace/default/freshsip_data/synthetic/erp"},
+        "pos": {"base_path": "/Volumes/workspace/default/freshsip_data/synthetic/pos"},
     },
     "tables": {
         "bronze": {

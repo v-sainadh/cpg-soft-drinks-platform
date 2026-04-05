@@ -15,23 +15,23 @@ layers:
 
 sources:
   erp:
-    base_path: data/synthetic/erp
+    base_path: /Volumes/workspace/default/freshsip_data/synthetic/erp
     format: csv
     options:
       header: "true"
       inferSchema: "false"
   pos:
-    base_path: data/synthetic/pos
+    base_path: /Volumes/workspace/default/freshsip_data/synthetic/pos
     format: json
     options:
       multiline: "false"
   production:
-    base_path: data/synthetic/production
+    base_path: /Volumes/workspace/default/freshsip_data/synthetic/production
     format: json
     options:
       multiline: "false"
   logistics:
-    base_path: data/synthetic/logistics
+    base_path: /Volumes/workspace/default/freshsip_data/synthetic/logistics
     format: csv
     options:
       header: "true"

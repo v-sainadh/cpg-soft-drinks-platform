@@ -186,6 +186,7 @@ flowchart TD
 
 ---
 
+
 ## 3. Databricks Topology — Community Edition
 
 ### Cluster Configuration
