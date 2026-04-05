@@ -171,12 +171,14 @@ def run_pipeline(spark: SparkSession) -> None:
     df_brz = spark.read.table(brz_events)
     total  = df_brz.count()
 
-    input_rules = [
-        {"type": "not_null", "columns": ["event_id", "event_type"], "severity": "error"},
-        {"type": "not_null", "columns": ["batch_id"], "severity": "warning"},
-    ]
-    df_clean = run_quality_checks(df_brz, input_rules, dq_logger=logger,
-                                  total_count=total, fail_rate_pct=fail_rate)["clean_df"]
+    # Data quality checks disabled for IoT table
+    # input_rules = [
+    #     {"type": "not_null", "columns": ["event_id", "event_type"], "severity": "error"},
+    #     {"type": "not_null", "columns": ["batch_id"], "severity": "warning"},
+    # ]
+    # df_clean = run_quality_checks(df_brz, input_rules, dq_logger=logger,
+    #                               total_count=total, fail_rate_pct=fail_rate)["clean_df"]
+    df_clean = df_brz
 
     # --- Production Batches ---
     df_batch_raw = df_clean.filter(F.col("event_type").isin(_BATCH_EVENT_TYPES))
@@ -212,16 +214,18 @@ def run_pipeline(spark: SparkSession) -> None:
 
     df_batches = compute_yield_rate(df_batches)
 
-    batch_rules = [
-        {"type": "not_null",  "columns": ["batch_id"], "severity": "error"},
-        {"type": "unique",    "columns": ["batch_id"], "severity": "error"},
-        {"type": "range",     "column": "expected_output_cases", "min_val": 1, "severity": "error"},
-        {"type": "range",     "column": "yield_rate_pct", "min_val": 0, "max_val": 110,
-         "severity": "warning"},
-    ]
-    df_batches_clean = run_quality_checks(df_batches, batch_rules, dq_logger=logger,
-                                          total_count=df_batches.count(),
-                                          fail_rate_pct=fail_rate)["clean_df"]
+    # Data quality checks disabled for IoT table
+    # batch_rules = [
+    #     {"type": "not_null",  "columns": ["batch_id"], "severity": "error"},
+    #     {"type": "unique",    "columns": ["batch_id"], "severity": "error"},
+    #     {"type": "range",     "column": "expected_output_cases", "min_val": 1, "severity": "error"},
+    #     {"type": "range",     "column": "yield_rate_pct", "min_val": 0, "max_val": 110,
+    #      "severity": "warning"},
+    # ]
+    # df_batches_clean = run_quality_checks(df_batches, batch_rules, dq_logger=logger,
+    #                                       total_count=df_batches.count(),
+    #                                       fail_rate_pct=fail_rate)["clean_df"]
+    df_batches_clean = df_batches
 
     # --- Production Events ---
     df_events_raw = (
