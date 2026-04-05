@@ -12,133 +12,133 @@
     {
       "type": "notebook",
       "name": "bronze/sales_ingestion",
-      "workspace_path": "/FreshSip/bronze/sales_ingestion",
+      "workspace_path": "/FreshSip/notebooks/bronze/sales_ingestion",
       "source_path": "src/bronze/sales_ingestion.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "bronze/inventory_ingestion",
-      "workspace_path": "/FreshSip/bronze/inventory_ingestion",
+      "workspace_path": "/FreshSip/notebooks/bronze/inventory_ingestion",
       "source_path": "src/bronze/inventory_ingestion.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "bronze/production_ingestion",
-      "workspace_path": "/FreshSip/bronze/production_ingestion",
+      "workspace_path": "/FreshSip/notebooks/bronze/production_ingestion",
       "source_path": "src/bronze/production_ingestion.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "bronze/distribution_ingestion",
-      "workspace_path": "/FreshSip/bronze/distribution_ingestion",
+      "workspace_path": "/FreshSip/notebooks/bronze/distribution_ingestion",
       "source_path": "src/bronze/distribution_ingestion.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "bronze/master_data_ingestion",
-      "workspace_path": "/FreshSip/bronze/master_data_ingestion",
+      "workspace_path": "/FreshSip/notebooks/bronze/master_data_ingestion",
       "source_path": "src/bronze/master_data_ingestion.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "silver/sales_transform",
-      "workspace_path": "/FreshSip/silver/sales_transform",
+      "workspace_path": "/FreshSip/notebooks/silver/sales_transform",
       "source_path": "notebooks/silver/sales_transform.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "silver/inventory_transform",
-      "workspace_path": "/FreshSip/silver/inventory_transform",
+      "workspace_path": "/FreshSip/notebooks/silver/inventory_transform",
       "source_path": "notebooks/silver/inventory_transform.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "silver/production_transform",
-      "workspace_path": "/FreshSip/silver/production_transform",
+      "workspace_path": "/FreshSip/notebooks/silver/production_transform",
       "source_path": "notebooks/silver/production_transform.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "silver/distribution_transform",
-      "workspace_path": "/FreshSip/silver/distribution_transform",
+      "workspace_path": "/FreshSip/notebooks/silver/distribution_transform",
       "source_path": "notebooks/silver/distribution_transform.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "silver/master_data_transform",
-      "workspace_path": "/FreshSip/silver/master_data_transform",
+      "workspace_path": "/FreshSip/notebooks/silver/master_data_transform",
       "source_path": "notebooks/silver/master_data_transform.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "gold/dim_date",
-      "workspace_path": "/FreshSip/gold/dim_date",
+      "workspace_path": "/FreshSip/notebooks/gold/dim_date",
       "source_path": "notebooks/gold/dim_date.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "gold/fact_sales",
-      "workspace_path": "/FreshSip/gold/fact_sales",
+      "workspace_path": "/FreshSip/notebooks/gold/fact_sales",
       "source_path": "notebooks/gold/fact_sales.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "gold/fact_inventory_snapshot",
-      "workspace_path": "/FreshSip/gold/fact_inventory_snapshot",
+      "workspace_path": "/FreshSip/notebooks/gold/fact_inventory_snapshot",
       "source_path": "notebooks/gold/fact_inventory_snapshot.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "gold/fact_production_batch",
-      "workspace_path": "/FreshSip/gold/fact_production_batch",
+      "workspace_path": "/FreshSip/notebooks/gold/fact_production_batch",
       "source_path": "notebooks/gold/fact_production_batch.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "gold/fact_shipment",
-      "workspace_path": "/FreshSip/gold/fact_shipment",
+      "workspace_path": "/FreshSip/notebooks/gold/fact_shipment",
       "source_path": "notebooks/gold/fact_shipment.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "gold/kpi_daily_revenue",
-      "workspace_path": "/FreshSip/gold/kpi_daily_revenue",
+      "workspace_path": "/FreshSip/notebooks/gold/kpi_daily_revenue",
       "source_path": "notebooks/gold/kpi_daily_revenue.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "gold/kpi_production_yield",
-      "workspace_path": "/FreshSip/gold/kpi_production_yield",
+      "workspace_path": "/FreshSip/notebooks/gold/kpi_production_yield",
       "source_path": "notebooks/gold/kpi_production_yield.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "gold/kpi_fulfillment_rate",
-      "workspace_path": "/FreshSip/gold/kpi_fulfillment_rate",
+      "workspace_path": "/FreshSip/notebooks/gold/kpi_fulfillment_rate",
       "source_path": "notebooks/gold/kpi_fulfillment_rate.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },
     {
       "type": "notebook",
       "name": "gold/kpi_inventory_turnover",
-      "workspace_path": "/FreshSip/gold/kpi_inventory_turnover",
+      "workspace_path": "/FreshSip/notebooks/gold/kpi_inventory_turnover",
       "source_path": "notebooks/gold/kpi_inventory_turnover.py",
       "uploaded_at": "2026-04-05T00:00:00+00:00"
     },

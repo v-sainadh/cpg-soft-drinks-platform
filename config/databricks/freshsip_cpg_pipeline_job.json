@@ -14,7 +14,7 @@
       "task_key": "bronze_sales",
       "description": "Bronze ingestion - Sales (POS transactions + ERP orders). Writes to brz_freshsip.pos_transactions_raw and brz_freshsip.erp_sales_raw.",
       "notebook_task": {
-        "notebook_path": "/FreshSip/bronze/sales_ingestion",
+        "notebook_path": "/FreshSip/notebooks/bronze/sales_ingestion",
         "source": "WORKSPACE"
       }
     },
@@ -22,7 +22,7 @@
       "task_key": "bronze_inventory",
       "description": "Bronze ingestion - Inventory (ERP inventory snapshots). Writes to brz_freshsip.erp_inventory_raw.",
       "notebook_task": {
-        "notebook_path": "/FreshSip/bronze/inventory_ingestion",
+        "notebook_path": "/FreshSip/notebooks/bronze/inventory_ingestion",
         "source": "WORKSPACE"
       }
     },
@@ -30,7 +30,7 @@
       "task_key": "bronze_production",
       "description": "Bronze ingestion - Production (IoT sensor events). Writes to brz_freshsip.iot_sensor_events_raw.",
       "notebook_task": {
-        "notebook_path": "/FreshSip/bronze/production_ingestion",
+        "notebook_path": "/FreshSip/notebooks/bronze/production_ingestion",
         "source": "WORKSPACE"
       }
     },
@@ -38,7 +38,7 @@
       "task_key": "bronze_distribution",
       "description": "Bronze ingestion - Distribution (logistics shipments). Writes to brz_freshsip.logistics_shipments_raw.",
       "notebook_task": {
-        "notebook_path": "/FreshSip/bronze/distribution_ingestion",
+        "notebook_path": "/FreshSip/notebooks/bronze/distribution_ingestion",
         "source": "WORKSPACE"
       }
     },
@@ -46,7 +46,7 @@
       "task_key": "bronze_master_data",
       "description": "Bronze ingestion - Master Data (products, customers, warehouses). Writes to brz_freshsip.erp_products_raw, brz_freshsip.erp_customers_raw, brz_freshsip.erp_warehouses_raw.",
       "notebook_task": {
-        "notebook_path": "/FreshSip/bronze/master_data_ingestion",
+        "notebook_path": "/FreshSip/notebooks/bronze/master_data_ingestion",
         "source": "WORKSPACE"
       }
     },
@@ -58,7 +58,7 @@
         {"task_key": "bronze_master_data"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/silver/sales_transform",
+        "notebook_path": "/FreshSip/notebooks/silver/sales_transform",
         "source": "WORKSPACE"
       }
     },
@@ -70,7 +70,7 @@
         {"task_key": "bronze_master_data"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/silver/inventory_transform",
+        "notebook_path": "/FreshSip/notebooks/silver/inventory_transform",
         "source": "WORKSPACE"
       }
     },
@@ -81,7 +81,7 @@
         {"task_key": "bronze_production"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/silver/production_transform",
+        "notebook_path": "/FreshSip/notebooks/silver/production_transform",
         "source": "WORKSPACE"
       }
     },
@@ -92,7 +92,7 @@
         {"task_key": "bronze_distribution"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/silver/distribution_transform",
+        "notebook_path": "/FreshSip/notebooks/silver/distribution_transform",
         "source": "WORKSPACE"
       }
     },
@@ -103,7 +103,7 @@
         {"task_key": "bronze_master_data"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/silver/master_data_transform",
+        "notebook_path": "/FreshSip/notebooks/silver/master_data_transform",
         "source": "WORKSPACE"
       }
     },
@@ -118,7 +118,7 @@
         {"task_key": "silver_master_data"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/gold/dim_date",
+        "notebook_path": "/FreshSip/notebooks/gold/dim_date",
         "source": "WORKSPACE"
       }
     },
@@ -129,7 +129,7 @@
         {"task_key": "gold_dim_date"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/gold/fact_sales",
+        "notebook_path": "/FreshSip/notebooks/gold/fact_sales",
         "source": "WORKSPACE"
       }
     },
@@ -140,7 +140,7 @@
         {"task_key": "gold_dim_date"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/gold/fact_inventory_snapshot",
+        "notebook_path": "/FreshSip/notebooks/gold/fact_inventory_snapshot",
         "source": "WORKSPACE"
       }
     },
@@ -151,7 +151,7 @@
         {"task_key": "gold_dim_date"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/gold/fact_production_batch",
+        "notebook_path": "/FreshSip/notebooks/gold/fact_production_batch",
         "source": "WORKSPACE"
       }
     },
@@ -162,7 +162,7 @@
         {"task_key": "gold_dim_date"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/gold/fact_shipment",
+        "notebook_path": "/FreshSip/notebooks/gold/fact_shipment",
         "source": "WORKSPACE"
       }
     },
@@ -173,7 +173,7 @@
         {"task_key": "gold_fact_sales"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/gold/kpi_daily_revenue",
+        "notebook_path": "/FreshSip/notebooks/gold/kpi_daily_revenue",
         "source": "WORKSPACE"
       }
     },
@@ -184,7 +184,7 @@
         {"task_key": "gold_fact_production_batch"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/gold/kpi_production_yield",
+        "notebook_path": "/FreshSip/notebooks/gold/kpi_production_yield",
         "source": "WORKSPACE"
       }
     },
@@ -195,7 +195,7 @@
         {"task_key": "gold_fact_shipment"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/gold/kpi_fulfillment_rate",
+        "notebook_path": "/FreshSip/notebooks/gold/kpi_fulfillment_rate",
         "source": "WORKSPACE"
       }
     },
@@ -207,7 +207,7 @@
         {"task_key": "gold_fact_sales"}
       ],
       "notebook_task": {
-        "notebook_path": "/FreshSip/gold/kpi_inventory_turnover",
+        "notebook_path": "/FreshSip/notebooks/gold/kpi_inventory_turnover",
         "source": "WORKSPACE"
       }
     }
